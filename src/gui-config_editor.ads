@@ -1,0 +1,533 @@
+with Gnoga.Gui.Base;
+with Gnoga.Gui.Element.Form;
+with Gnoga.Gui.Element.Table;
+with Gnoga.Gui.Element.Common;
+with Gnoga.Gui.Element;
+with Gnoga.Gui.View;
+with Config.Config;
+with UXStrings;       use UXStrings;
+with Gnoga.Types;
+with GUI.Cards_Table; use GUI.Cards_Table;
+with Physical_Types;  use Physical_Types;
+with Motion_Planner;
+with GUI.Discrete_Inputs;
+
+private generic
+   with package My_Config is new Config.Config (<>);
+   with procedure Log_And_Switch_Tab (Object : Gnoga.Types.Pointer_to_Connection_Data_Class; Message : UXString);
+package GUI.Config_Editor is
+
+   use My_Config;
+
+   package Basic_Inputs is
+
+      type Length_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Length_Input) return Physical_Types.Length;
+      procedure Set (Input : in out Length_Input; Value : Physical_Types.Length);
+
+      type Time_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Time_Input) return Time;
+      procedure Set (Input : in out Time_Input; Value : Time);
+
+      type Cruise_Ratio_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Cruise_Ratio_Input) return Cruise_Ratio;
+      procedure Set (Input : in out Cruise_Ratio_Input; Value : Cruise_Ratio);
+
+      type Temperature_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Temperature_Input) return Temperature;
+      procedure Set (Input : in out Temperature_Input; Value : Temperature);
+
+      type Dimensionless_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Dimensionless_Input) return Dimensionless;
+      procedure Set (Input : in out Dimensionless_Input; Value : Dimensionless);
+
+      type PWM_Scale_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : PWM_Scale_Input) return PWM_Scale;
+      procedure Set (Input : in out PWM_Scale_Input; Value : PWM_Scale);
+
+      type Voltage_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Voltage_Input) return Voltage;
+      procedure Set (Input : in out Voltage_Input; Value : Voltage);
+
+      type Path_String_Input is new Gnoga.Gui.Element.Form.Text_Type with null record;
+      function Get (Input : Path_String_Input) return Path_Strings.Bounded_String;
+      procedure Set (Input : in out Path_String_Input; Value : Path_Strings.Bounded_String);
+
+      type Boolean_Input is new Gnoga.Gui.Element.Form.Check_Box_Type with null record;
+      function Get (Input : Boolean_Input) return Boolean;
+      procedure Set (Input : in out Boolean_Input; Value : Boolean);
+
+      package Stepper_Name_Input is new Discrete_Inputs (Stepper_Name);
+      package Heater_Name_Input is new Discrete_Inputs (Heater_Name);
+      package Thermistor_Name_Input is new Discrete_Inputs (Thermistor_Name);
+      package Fan_Name_Input is new Discrete_Inputs (Fan_Name);
+      package Input_Switch_Name_Input is new Discrete_Inputs (Input_Switch_Name);
+
+   end Basic_Inputs;
+
+   package Parameter_Rows is
+
+      subtype Parent_Type is Gnoga.Gui.Element.Table.Table_Row_Type;
+
+      type Parameter_Row is new Parent_Type with private;
+
+      procedure Create
+        (Row         : in out Parameter_Row;
+         Parent      : in out Gnoga.Gui.Element.Element_Type'Class;
+         Name        :        UXString;
+         Description :        UXString;
+         Data        : in out Gnoga.Gui.Element.Element_Type'Class;
+         ID          :        UXString := "");
+
+   private
+
+      overriding procedure Create
+        (Row : in out Parameter_Row; Parent : in out Gnoga.Gui.Element.Element_Type'Class; ID : UXString := "");
+
+      type Parameter_Row is new Parent_Type with record
+         Name        : Gnoga.Gui.Element.Common.DIV_Type;
+         Description : Gnoga.Gui.Element.Common.DIV_Type;
+
+         Name_Col        : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Description_Col : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Data_Col        : Gnoga.Gui.Element.Table.Table_Column_Type;
+      end record;
+
+   end Parameter_Rows;
+
+   package Grouped_Element_Widgets is
+
+      type Position_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
+
+      procedure Create
+        (Widget : in out Position_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "");
+
+      function Get (Widget : Position_Widget) return Physical_Types.Position;
+      procedure Set (Widget : in out Position_Widget; Pos : Physical_Types.Position);
+
+      type Position_Scale_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
+
+      procedure Create
+        (Widget : in out Position_Scale_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "");
+
+      function Get (Widget : Position_Scale_Widget) return Physical_Types.Position_Scale;
+      procedure Set (Widget : in out Position_Scale_Widget; Scale : Physical_Types.Position_Scale);
+
+      type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
+
+      procedure Create
+        (Widget : in out Kinematic_Limits_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "");
+
+      function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits;
+      procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits);
+
+      type Attached_Steppers_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
+
+      procedure Create
+        (Widget : in out Attached_Steppers_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "");
+
+      function Get (Widget : Attached_Steppers_Widget) return Attached_Steppers;
+      procedure Set (Widget : in out Attached_Steppers_Widget; Steppers : Attached_Steppers);
+
+   private
+
+      type Numeric_Row is new Gnoga.Gui.Element.Table.Table_Row_Type with record
+         Name      : Gnoga.Gui.Element.Common.DIV_Type;
+         Name_Col  : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Input_Col : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Input     : Gnoga.Gui.Element.Form.Number_Type;
+      end record;
+
+      procedure Create
+        (Row    : in out Numeric_Row;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         Name   :        UXString;
+         ID     :        UXString := "");
+
+      type Check_Box_Row is new Gnoga.Gui.Element.Table.Table_Row_Type with record
+         Name      : Gnoga.Gui.Element.Common.DIV_Type;
+         Name_Col  : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Input_Col : Gnoga.Gui.Element.Table.Table_Column_Type;
+         Input     : Gnoga.Gui.Element.Form.Check_Box_Type;
+      end record;
+
+      procedure Create
+        (Row    : in out Check_Box_Row;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         Name   :        UXString;
+         ID     :        UXString := "");
+
+      type Position_Rows is array (Axis_Name) of Numeric_Row;
+      type Position_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
+         Rows : Position_Rows;
+      end record;
+
+      type Position_Scale_Rows is array (Axis_Name) of Numeric_Row;
+      type Position_Scale_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
+         Rows : Position_Scale_Rows;
+      end record;
+
+      type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
+         Tangential_Velocity_Max : Numeric_Row;
+         Acceleration_Max        : Numeric_Row;
+         Jerk_Max                : Numeric_Row;
+         Snap_Max                : Numeric_Row;
+         Crackle_Max             : Numeric_Row;
+         Chord_Error_Max         : Numeric_Row;
+      end record;
+
+      type Stepper_Rows is array (Stepper_Name) of Check_Box_Row;
+      type Attached_Steppers_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
+         Rows : Stepper_Rows;
+      end record;
+
+   end Grouped_Element_Widgets;
+
+   package Outer_Section_Widgets is
+      subtype Parent_Type is Gnoga.Gui.Element.Form.Form_Type;
+
+      type Outer_Section_Widget is abstract new Parent_Type with null record;
+
+      procedure Read_Data (View : in out Outer_Section_Widget) is abstract;
+
+      procedure Save_Data (View : in out Outer_Section_Widget; Image : out UXString) is abstract;
+
+      procedure On_Submit (Object : in out Gnoga.Gui.Base.Base_Type'Class);
+   end Outer_Section_Widgets;
+
+   package Section_Widgets is
+
+      subtype Parent_Type is Outer_Section_Widgets.Outer_Section_Widget;
+
+      type Prunt_Widget is new Parent_Type with private;
+
+      procedure Create_Widget (View : in out Prunt_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class);
+
+      type Stepper_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View : in out Stepper_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class; Stepper : Stepper_Name);
+
+      type Kinematics_Widget is new Parent_Type with private;
+
+      procedure Create_Widget (View : in out Kinematics_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class);
+
+      type Input_Switch_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View         : in out Input_Switch_Widget;
+         Parent       : in out Gnoga.Gui.Base.Base_Type'Class;
+         Input_Switch :        Input_Switch_Name);
+
+      type Homing_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View : in out Homing_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class; Axis : Axis_Name);
+
+      type Extruder_Widget is new Parent_Type with private;
+
+      procedure Create_Widget (View : in out Extruder_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class);
+
+      type Thermistor_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View       : in out Thermistor_Widget;
+         Parent     : in out Gnoga.Gui.Base.Base_Type'Class;
+         Thermistor :        Thermistor_Name);
+
+      type Heater_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View : in out Heater_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class; Heater : Heater_Name);
+
+      type Bed_Mesh_Widget is new Parent_Type with private;
+
+      procedure Create_Widget (View : in out Bed_Mesh_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class);
+
+      type Fan_Widget is new Parent_Type with private;
+
+      procedure Create_Widget
+        (View : in out Fan_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class; Fan : Fan_Name);
+
+      type G_Code_Assignment_Widget is new Parent_Type with private;
+
+      procedure Create_Widget (View : in out G_Code_Assignment_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class);
+
+   private
+
+      type Prunt_Widget is new Parent_Type with record
+         Widget_Table  : Gnoga.Gui.Element.Table.Table_Type;
+         Enabled_Row   : Parameter_Rows.Parameter_Row;
+         Enabled_Input : Basic_Inputs.Boolean_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Stepper_Widget is new Parent_Type with record
+         Stepper : Stepper_Name;
+
+         Widget_Table               : Gnoga.Gui.Element.Table.Table_Type;
+         Enabled_Row                : Parameter_Rows.Parameter_Row;
+         Enabled_Input              : Basic_Inputs.Boolean_Input;
+         Invert_Direction_Row       : Parameter_Rows.Parameter_Row;
+         Invert_Direction_Input     : Basic_Inputs.Boolean_Input;
+         Enabled_On_High_Row        : Parameter_Rows.Parameter_Row;
+         Enabled_On_High_Input      : Basic_Inputs.Boolean_Input;
+         Fault_On_High_Row          : Parameter_Rows.Parameter_Row;
+         Fault_On_High_Input        : Basic_Inputs.Boolean_Input;
+         Mm_Per_Step_Row            : Parameter_Rows.Parameter_Row;
+         Mm_Per_Step_Input          : Basic_Inputs.Length_Input;
+         Direction_Setup_Time_Row   : Parameter_Rows.Parameter_Row;
+         Direction_Setup_Time_Input : Basic_Inputs.Time_Input;
+         Step_Time_Row              : Parameter_Rows.Parameter_Row;
+         Step_Time_Input            : Basic_Inputs.Time_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Kinematics_Widget is new Parent_Type with record
+         Widget_Table               : Gnoga.Gui.Element.Table.Table_Type;
+         Lower_Pos_Limit_Row        : Parameter_Rows.Parameter_Row;
+         Lower_Pos_Limit_Input      : Grouped_Element_Widgets.Position_Widget;
+         Upper_Pos_Limit_Row        : Parameter_Rows.Parameter_Row;
+         Upper_Pos_Limit_Input      : Grouped_Element_Widgets.Position_Widget;
+         Max_Limits_Row             : Parameter_Rows.Parameter_Row;
+         Max_Limits_Input           : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Starting_Limits_Row        : Parameter_Rows.Parameter_Row;
+         Starting_Limits_Input      : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Planning_Scaler_Row        : Parameter_Rows.Parameter_Row;
+         Planning_Scaler_Input      : Grouped_Element_Widgets.Position_Scale_Widget;
+         Minimum_Cruise_Ratio_Row   : Parameter_Rows.Parameter_Row;
+         Minimum_Cruise_Ratio_Input : Basic_Inputs.Cruise_Ratio_Input;
+         Z_Steppers_Row             : Parameter_Rows.Parameter_Row;
+         Z_Steppers_Input           : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         E_Steppers_Row             : Parameter_Rows.Parameter_Row;
+         E_Steppers_Input           : Grouped_Element_Widgets.Attached_Steppers_Widget;
+
+         Kind_Table : Cards_Table_Type;
+
+         Cartesian_Table  : aliased Gnoga.Gui.Element.Table.Table_Type;
+         X_Steppers_Row   : Parameter_Rows.Parameter_Row;
+         X_Steppers_Input : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         Y_Steppers_Row   : Parameter_Rows.Parameter_Row;
+         Y_Steppers_Input : Grouped_Element_Widgets.Attached_Steppers_Widget;
+
+         Core_XY_Table    : aliased Gnoga.Gui.Element.Table.Table_Type;
+         A_Steppers_Row   : Parameter_Rows.Parameter_Row;
+         A_Steppers_Input : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         B_Steppers_Row   : Parameter_Rows.Parameter_Row;
+         B_Steppers_Input : Grouped_Element_Widgets.Attached_Steppers_Widget;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Input_Switch_Widget is new Parent_Type with record
+         Input_Switch : Input_Switch_Name;
+
+         Widget_Table      : Gnoga.Gui.Element.Table.Table_Type;
+         Enabled_Row       : Parameter_Rows.Parameter_Row;
+         Enabled_Input     : Basic_Inputs.Boolean_Input;
+         Hit_On_High_Row   : Parameter_Rows.Parameter_Row;
+         Hit_On_High_Input : Basic_Inputs.Boolean_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Homing_Widget is new Parent_Type with record
+         Axis : Axis_Name;
+
+         Widget_Table : Gnoga.Gui.Element.Table.Table_Type;
+
+         Kind_Table : Cards_Table_Type;
+
+         Double_Tap_Table           : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Switch_Row                 : Parameter_Rows.Parameter_Row;
+         Switch_Input               : Basic_Inputs.Input_Switch_Name_Input.Discrete_Input;
+         First_Move_Distance_Row    : Parameter_Rows.Parameter_Row;
+         First_Move_Distance_Input  : Basic_Inputs.Length_Input;
+         First_Move_Limits_Row      : Parameter_Rows.Parameter_Row;
+         First_Move_Limits_Input    : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Second_Move_Distance_Row   : Parameter_Rows.Parameter_Row;
+         Second_Move_Distance_Input : Basic_Inputs.Length_Input;
+         Second_Move_Limits_Row     : Parameter_Rows.Parameter_Row;
+         Second_Move_Limits_Input   : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Switch_Position_Row        : Parameter_Rows.Parameter_Row;
+         Switch_Position_Input      : Basic_Inputs.Length_Input;
+
+         Set_To_Value_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Value_Row          : Parameter_Rows.Parameter_Row;
+         Value_Input        : Basic_Inputs.Length_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Extruder_Widget is new Parent_Type with record
+         Widget_Table                         : Gnoga.Gui.Element.Table.Table_Type;
+         Nozzle_Diameter_Row                  : Parameter_Rows.Parameter_Row;
+         Nozzle_Diameter_Input                : Basic_Inputs.Length_Input;
+         Filament_Diameter_Row                : Parameter_Rows.Parameter_Row;
+         Filament_Diameter_Input              : Basic_Inputs.Length_Input;
+         Starting_Pressure_Advance_Time_Row   : Parameter_Rows.Parameter_Row;
+         Starting_Pressure_Advance_Time_Input : Basic_Inputs.Time_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Thermistor_Widget is new Parent_Type with record
+         Thermistor : Thermistor_Name;
+
+         Widget_Table              : Gnoga.Gui.Element.Table.Table_Type;
+         Enabled_Row               : Parameter_Rows.Parameter_Row;
+         Enabled_Input             : Basic_Inputs.Boolean_Input;
+         Minimum_Temperature_Row   : Parameter_Rows.Parameter_Row;
+         Minimum_Temperature_Input : Basic_Inputs.Temperature_Input;
+         Maximum_Temperature_Row   : Parameter_Rows.Parameter_Row;
+         Maximum_Temperature_Input : Basic_Inputs.Temperature_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Heater_Widget is new Parent_Type with record
+         Heater : Heater_Name;
+
+         Widget_Table     : Gnoga.Gui.Element.Table.Table_Type;
+         Thermistor_Row   : Parameter_Rows.Parameter_Row;
+         Thermistor_Input : Basic_Inputs.Thermistor_Name_Input.Discrete_Input;
+
+         Kind_Table : Cards_Table_Type;
+
+         Disabled_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
+
+         PID_Table                : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Proportional_Scale_Row   : Parameter_Rows.Parameter_Row;
+         Proportional_Scale_Input : Basic_Inputs.Dimensionless_Input;
+         Integral_Scale_Row       : Parameter_Rows.Parameter_Row;
+         Integral_Scale_Input     : Basic_Inputs.Dimensionless_Input;
+         Derivative_Scale_Row     : Parameter_Rows.Parameter_Row;
+         Derivative_Scale_Input   : Basic_Inputs.Dimensionless_Input;
+
+         Bang_Bang_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Max_Delta_Row   : Parameter_Rows.Parameter_Row;
+         Max_Delta_Input : Basic_Inputs.Temperature_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Bed_Mesh_Widget is new Parent_Type with record
+         Widget_Table : Gnoga.Gui.Element.Table.Table_Type;
+
+         Kind_Table : Cards_Table_Type;
+
+         No_Mesh_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
+
+         Beacon_Table              : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Serial_Port_Path_Row      : Parameter_Rows.Parameter_Row;
+         Serial_Port_Path_Input    : Basic_Inputs.Path_String_Input;
+         X_Offset_Row              : Parameter_Rows.Parameter_Row;
+         X_Offset_Input            : Basic_Inputs.Length_Input;
+         Y_Offset_Row              : Parameter_Rows.Parameter_Row;
+         Y_Offset_Input            : Basic_Inputs.Length_Input;
+         Calibration_Floor_Row     : Parameter_Rows.Parameter_Row;
+         Calibration_Floor_Input   : Basic_Inputs.Length_Input;
+         Calibration_Ceiling_Row   : Parameter_Rows.Parameter_Row;
+         Calibration_Ceiling_Input : Basic_Inputs.Length_Input;
+         Calibration_Limits_Row    : Parameter_Rows.Parameter_Row;
+         Calibration_Limits_Input  : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type Fan_Widget is new Parent_Type with record
+         Fan : Fan_Name;
+
+         Widget_Table : Gnoga.Gui.Element.Table.Table_Type;
+
+         Kind_Table : Cards_Table_Type;
+
+         Disabled_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
+
+         Dynamic_PWM_Table       : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Disable_Below_PWM_Row   : Parameter_Rows.Parameter_Row;
+         Disable_Below_PWM_Input : Basic_Inputs.PWM_Scale_Input;
+         Max_PWM_Row             : Parameter_Rows.Parameter_Row;
+         Max_PWM_Input           : Basic_Inputs.PWM_Scale_Input;
+         Fixed_Voltage_Row       : Parameter_Rows.Parameter_Row;
+         Fixed_Voltage_Input     : Basic_Inputs.Voltage_Input;
+
+         Dynamic_Voltage_Table       : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Disable_Below_Voltage_Row   : Parameter_Rows.Parameter_Row;
+         Disable_Below_Voltage_Input : Basic_Inputs.Voltage_Input;
+         Max_Voltage_Row             : Parameter_Rows.Parameter_Row;
+         Max_Voltage_Input           : Basic_Inputs.Voltage_Input;
+
+         Always_On_Table         : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Always_On_PWM_Row       : Parameter_Rows.Parameter_Row;
+         Always_On_PWM_Input     : Basic_Inputs.PWM_Scale_Input;
+         Always_On_Voltage_Row   : Parameter_Rows.Parameter_Row;
+         Always_On_Voltage_Input : Basic_Inputs.Voltage_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      type G_Code_Assignment_Widget is new Parent_Type with record
+         Widget_Table         : Gnoga.Gui.Element.Table.Table_Type;
+         Bed_Heater_Row       : Parameter_Rows.Parameter_Row;
+         Bed_Heater_Input     : Basic_Inputs.Heater_Name_Input.Discrete_Input;
+         --  Chamber_Heater_Row   : Parameter_Rows.Parameter_Row;
+         --  Chamber_Heater_Input : Basic_Inputs.Heater_Name_Input.Discrete_Input;
+         Hotend_Heater_Row    : Parameter_Rows.Parameter_Row;
+         Hotend_Heater_Input  : Basic_Inputs.Heater_Name_Input.Discrete_Input;
+
+         Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
+      end record;
+
+      overriding procedure Read_Data (View : in out Prunt_Widget);
+      overriding procedure Save_Data (View : in out Prunt_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Stepper_Widget);
+      overriding procedure Save_Data (View : in out Stepper_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Kinematics_Widget);
+      overriding procedure Save_Data (View : in out Kinematics_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Input_Switch_Widget);
+      overriding procedure Save_Data (View : in out Input_Switch_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Homing_Widget);
+      overriding procedure Save_Data (View : in out Homing_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Extruder_Widget);
+      overriding procedure Save_Data (View : in out Extruder_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Thermistor_Widget);
+      overriding procedure Save_Data (View : in out Thermistor_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Heater_Widget);
+      overriding procedure Save_Data (View : in out Heater_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Bed_Mesh_Widget);
+      overriding procedure Save_Data (View : in out Bed_Mesh_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out Fan_Widget);
+      overriding procedure Save_Data (View : in out Fan_Widget; Image : out UXString);
+
+      overriding procedure Read_Data (View : in out G_Code_Assignment_Widget);
+      overriding procedure Save_Data (View : in out G_Code_Assignment_Widget; Image : out UXString);
+
+   end Section_Widgets;
+
+end GUI.Config_Editor;

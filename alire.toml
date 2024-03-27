@@ -1,0 +1,18 @@
+name = "prunt_gui"
+description = "GUI for Prunt."
+version = "0.1.0-dev"
+
+authors = ["Liam Powell"]
+maintainers = ["Liam Powell <liam@liampll.com>"]
+maintainers-logins = ["liampwll"]
+[[depends-on]]
+gnoga = "^2.1.2"
+prunt_physical_types = "*"
+prunt_config = "*"
+[[pins]]
+prunt_physical_types = { path = "../prunt_physical_types" }
+prunt_config = { path = "../prunt_config" }
+gnoga = { path = "../gnoga" }
+
+[build-switches]
+release.optimization = []
