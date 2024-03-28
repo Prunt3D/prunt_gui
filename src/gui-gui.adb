@@ -1,3 +1,5 @@
+with Ada.Unchecked_Deallocation;
+
 package body GUI.GUI is
 
    procedure On_Exit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
@@ -10,10 +12,11 @@ package body GUI.GUI is
      (Main_Window : in out Gnoga.Gui.Window.Window_Type'Class;
       Connection  :        access Gnoga.Application.Multi_Connect.Connection_Holder_Type)
    is
-      pragma Unreferenced (Connection);
       App : App_Access := new App_Data;
+
+      procedure Free_Data is new Ada.Unchecked_Deallocation (App_Data, App_Access);
    begin
-      Main_Window.Connection_Data (App);
+      Main_Window.Connection_Data (Data => App, Dynamic => False);
 
       App.Main_Window := Main_Window'Unchecked_Access;
 
@@ -135,6 +138,11 @@ package body GUI.GUI is
          App.Log_Widget.Style ("max-height", "500px");
          App.Main_Table.Add_Tab ("Log", App.Log_Widget'Access);
       end;
+
+      Connection.Hold;
+
+      --  Gnoga leaks memory if we allow it to handle freeing the data.
+      Free_Data (App);
    end On_Connect;
 
    procedure Log_And_Switch_Tab (Object : Gnoga.Types.Pointer_to_Connection_Data_Class; Message : UXString) is
