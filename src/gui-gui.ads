@@ -37,6 +37,7 @@ private
    type Fan_Widgets is array (My_Config.Fan_Name) of aliased My_Config_Editor.Section_Widgets.Fan_Widget;
 
    type App_Data is new Gnoga.Types.Connection_Data_Type with record
+      Loading_Div                            : aliased Gnoga.Gui.Element.Common.DIV_Type;
       Main_Window                            : aliased Gnoga.Gui.Window.Pointer_To_Window_Class;
       Main_Table                             : aliased Cards_Table_Type;
       Config_Editor_Table                    : aliased Cards_Table_Type;

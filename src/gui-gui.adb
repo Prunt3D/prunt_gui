@@ -22,7 +22,14 @@ package body GUI.GUI is
 
       App.Main_Window.Disable_Auto_Set_View;
 
+      App.Loading_Div.Create
+        (App.Main_Window.all,
+         "<h1>Loading, please wait.</h1><p>If this takes more than a few seconds then it is likely that something has gone wrong, check the console output.</p>");
+      App.Loading_Div.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
+
       App.Main_Table.Create (App.Main_Window.all);
+      App.Main_Table.Hidden (True);
+
       App.Main_Table.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
       --  This avoids the window resizing our tables.
 
@@ -138,6 +145,9 @@ package body GUI.GUI is
          App.Log_Widget.Style ("max-height", "500px");
          App.Main_Table.Add_Tab ("Log", App.Log_Widget'Access);
       end;
+
+      App.Loading_Div.Hidden (True);
+      App.Main_Table.Hidden (False);
 
       Connection.Hold;
 
