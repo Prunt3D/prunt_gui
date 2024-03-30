@@ -1371,9 +1371,9 @@ package body GUI.Config_Editor is
       overriding procedure Save_Data (View : in out G_Code_Assignment_Widget; Image : out UXString) is
          Params : G_Code_Assignment_Parameters;
       begin
-         Params.Bed_Heater     := View.Bed_Heater_Input.Get;
+         Params.Bed_Heater    := View.Bed_Heater_Input.Get;
          --  Params.Chamber_Heater := View.Chamber_Heater_Input.Get;
-         Params.Hotend_Heater  := View.Hotend_Heater_Input.Get;
+         Params.Hotend_Heater := View.Hotend_Heater_Input.Get;
 
          My_Config.Config_File.Write (Params);
 

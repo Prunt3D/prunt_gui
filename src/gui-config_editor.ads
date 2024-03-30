@@ -484,13 +484,13 @@ package GUI.Config_Editor is
       end record;
 
       type G_Code_Assignment_Widget is new Parent_Type with record
-         Widget_Table         : Gnoga.Gui.Element.Table.Table_Type;
-         Bed_Heater_Row       : Parameter_Rows.Parameter_Row;
-         Bed_Heater_Input     : Basic_Inputs.Heater_Name_Input.Discrete_Input;
+         Widget_Table        : Gnoga.Gui.Element.Table.Table_Type;
+         Bed_Heater_Row      : Parameter_Rows.Parameter_Row;
+         Bed_Heater_Input    : Basic_Inputs.Heater_Name_Input.Discrete_Input;
          --  Chamber_Heater_Row   : Parameter_Rows.Parameter_Row;
          --  Chamber_Heater_Input : Basic_Inputs.Heater_Name_Input.Discrete_Input;
-         Hotend_Heater_Row    : Parameter_Rows.Parameter_Row;
-         Hotend_Heater_Input  : Basic_Inputs.Heater_Name_Input.Discrete_Input;
+         Hotend_Heater_Row   : Parameter_Rows.Parameter_Row;
+         Hotend_Heater_Input : Basic_Inputs.Heater_Name_Input.Discrete_Input;
 
          Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
       end record;
