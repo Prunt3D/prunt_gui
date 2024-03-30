@@ -14,9 +14,13 @@ with Gnoga.Gui.View.Docker;
 with Gnoga.Gui.Element.Table;
 with GUI.Cards_Table; use GUI.Cards_Table;
 with UXStrings;       use UXStrings;
+with Physical_Types;  use Physical_Types;
 
 generic
    with package My_Config is new Config.Config (<>);
+   with function Get_Status_Message return String;
+   with function Get_Position return Physical_Types.Position;
+   --  with procedure Submit_Gcode (Command : String; Result : out String);
 package GUI.GUI is
 
    procedure Run;
@@ -37,9 +41,12 @@ private
    type Fan_Widgets is array (My_Config.Fan_Name) of aliased My_Config_Editor.Section_Widgets.Fan_Widget;
 
    type App_Data is new Gnoga.Types.Connection_Data_Type with record
-      Loading_Div                            : aliased Gnoga.Gui.Element.Common.DIV_Type;
-      Main_Window                            : aliased Gnoga.Gui.Window.Pointer_To_Window_Class;
-      Main_Table                             : aliased Cards_Table_Type;
+      Main_Window : aliased Gnoga.Gui.Window.Pointer_To_Window_Class;
+
+      Loading_Div : aliased Gnoga.Gui.Element.Common.DIV_Type;
+
+      Main_Table : aliased Cards_Table_Type;
+
       Config_Editor_Table                    : aliased Cards_Table_Type;
       Config_Editor_Prunt_Widget             : aliased My_Config_Editor.Section_Widgets.Prunt_Widget;
       Config_Editor_Steppers_Table           : aliased Cards_Table_Type;
@@ -58,9 +65,21 @@ private
       Config_Editor_Fans_Table               : aliased Cards_Table_Type;
       Config_Editor_Fan_Widgets              : aliased Fan_Widgets;
       Config_Editor_G_Code_Assignment_Widget : aliased My_Config_Editor.Section_Widgets.G_Code_Assignment_Widget;
-      Log_Widget                             : aliased Gnoga.Gui.View.Console.Console_View_Type;
+
+      Log_Widget : aliased Gnoga.Gui.View.Console.Console_View_Type;
+
+      Status_Table         : aliased Gnoga.Gui.Element.Table.Table_Type;
+      Status_Message_Row   : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Status_Message_Text  : aliased Gnoga.Gui.Element.Common.DIV_Type;
+      Status_Position_Row  : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Status_Position_Text : aliased Gnoga.Gui.Element.Common.DIV_Type;
    end record;
 
    type App_Access is access all App_Data;
+
+   task type Status_Updater is
+      entry Start (In_App : App_Access);
+      entry Stop;
+   end Status_Updater;
 
 end GUI.GUI;

@@ -2,6 +2,57 @@ with Ada.Unchecked_Deallocation;
 
 package body GUI.GUI is
 
+   function To_HTML (S : UXString) return UXString is
+      function Translate_Character (C : Unicode_Character) return UXString is
+      begin
+         if C = Unicode_Character'Val (10) then
+            return "</br>";
+         elsif C = Unicode_Character'Val (13) then
+            return "</br>";
+         elsif C = '&' then
+            return "&amp;";
+         elsif C = '<' then
+            return "&lt;";
+         elsif C = '>' then
+            return "&gt;";
+         elsif C = '"' then
+            return "&quot;";
+         elsif C = ''' then
+            return "&#39;";
+         else
+            return From_Unicode (C);
+         end if;
+      end Translate_Character;
+
+      R : UXString;
+   begin
+      for C in S loop
+         Append (R, Translate_Character (S (C)));
+      end loop;
+
+      return R;
+   end To_HTML;
+
+   task body Status_Updater is
+      App : App_Access;
+   begin
+      accept Start (In_App : App_Access) do
+         App := In_App;
+      end Start;
+
+      loop
+         select
+            accept Stop;
+            exit;
+         or
+            delay 0.5;
+            App.Status_Message_Text.Inner_HTML (To_HTML (From_Latin_1 ("Status: " & Get_Status_Message)));
+            App.Status_Position_Text.Inner_HTML
+              (To_HTML (From_Latin_1 ("Position: " & Physical_Types.Position'Image (Get_Position))));
+         end select;
+      end loop;
+   end Status_Updater;
+
    procedure On_Exit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
       App : constant App_Access := App_Access (Object.Connection_Data);
    begin
@@ -12,6 +63,8 @@ package body GUI.GUI is
      (Main_Window : in out Gnoga.Gui.Window.Window_Type'Class;
       Connection  :        access Gnoga.Application.Multi_Connect.Connection_Holder_Type)
    is
+      Status_Updater_Task : Status_Updater;
+
       App : App_Access := new App_Data;
 
       procedure Free_Data is new Ada.Unchecked_Deallocation (App_Data, App_Access);
@@ -32,6 +85,19 @@ package body GUI.GUI is
 
       App.Main_Table.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
       --  This avoids the window resizing our tables.
+
+      --  Status
+      begin
+         App.Status_Table.Create (App.Main_Table.Cards);
+         App.Main_Table.Add_Tab ("Status", App.Status_Table'Access);
+
+         App.Status_Message_Row.Create (App.Status_Table);
+         App.Status_Message_Text.Create (App.Status_Message_Row);
+         App.Status_Position_Row.Create (App.Status_Table);
+         App.Status_Position_Text.Create (App.Status_Position_Row);
+
+         Status_Updater_Task.Start (App);
+      end;
 
       --  Config Editor
       begin
@@ -146,47 +212,19 @@ package body GUI.GUI is
          App.Main_Table.Add_Tab ("Log", App.Log_Widget'Access);
       end;
 
+      App.Main_Table.Cards.Show_Card ("Status");
       App.Loading_Div.Hidden (True);
       App.Main_Table.Hidden (False);
 
       Connection.Hold;
+
+      Status_Updater_Task.Stop;
 
       --  Gnoga leaks memory if we allow it to handle freeing the data.
       Free_Data (App);
    end On_Connect;
 
    procedure Log_And_Switch_Tab (Object : Gnoga.Types.Pointer_to_Connection_Data_Class; Message : UXString) is
-      function To_HTML (S : UXString) return UXString is
-         function Translate_Character (C : Unicode_Character) return UXString is
-         begin
-            if C = Unicode_Character'Val (10) then
-               return "</br>";
-            elsif C = Unicode_Character'Val (13) then
-               return "</br>";
-            elsif C = '&' then
-               return "&amp;";
-            elsif C = '<' then
-               return "&lt;";
-            elsif C = '>' then
-               return "&gt;";
-            elsif C = '"' then
-               return "&quot;";
-            elsif C = ''' then
-               return "&#39;";
-            else
-               return From_Unicode (C);
-            end if;
-         end Translate_Character;
-
-         R : UXString;
-      begin
-         for C in S loop
-            Append (R, Translate_Character (S (C)));
-         end loop;
-
-         return R;
-      end To_HTML;
-
       procedure Inner (App : App_Access) is
       begin
          App.Log_Widget.Put_Line (To_HTML (Message));

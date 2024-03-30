@@ -9,10 +9,12 @@ maintainers-logins = ["liampwll"]
 gnoga = "^2.1.2"
 prunt_physical_types = "*"
 prunt_config = "*"
+prunt_motion_planner = "*"
 [[pins]]
 prunt_physical_types = { path = "../prunt_physical_types" }
 prunt_config = { path = "../prunt_config" }
 gnoga = { path = "../gnoga" }
+prunt_motion_planner = { path = "../prunt_motion_planner" }
 
 [build-switches]
 release.optimization = []
