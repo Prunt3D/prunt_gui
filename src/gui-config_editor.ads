@@ -49,6 +49,10 @@ package GUI.Config_Editor is
       function Get (Input : Voltage_Input) return Voltage;
       procedure Set (Input : in out Voltage_Input; Value : Voltage);
 
+      type Velocity_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Velocity_Input) return Velocity;
+      procedure Set (Input : in out Velocity_Input; Value : Velocity);
+
       type Path_String_Input is new Gnoga.Gui.Element.Form.Text_Type with null record;
       function Get (Input : Path_String_Input) return Path_Strings.Bounded_String;
       procedure Set (Input : in out Path_String_Input; Value : Path_Strings.Bounded_String);
@@ -119,6 +123,17 @@ package GUI.Config_Editor is
       function Get (Widget : Position_Scale_Widget) return Physical_Types.Position_Scale;
       procedure Set (Widget : in out Position_Scale_Widget; Scale : Physical_Types.Position_Scale);
 
+      type Axial_Velocities_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
+
+      procedure Create
+        (Widget : in out Axial_Velocities_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "");
+
+      function Get (Widget : Axial_Velocities_Widget) return Physical_Types.Axial_Velocities;
+      procedure Set (Widget : in out Axial_Velocities_Widget; Vels : Physical_Types.Axial_Velocities);
+
       type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
 
       procedure Create
@@ -181,13 +196,17 @@ package GUI.Config_Editor is
          Rows : Position_Scale_Rows;
       end record;
 
+      type Axial_Velocities_Rows is array (Axis_Name) of Numeric_Row;
+      type Axial_Velocities_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
+         Rows : Axial_Velocities_Rows;
+      end record;
+
       type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
-         Tangential_Velocity_Max : Numeric_Row;
-         Acceleration_Max        : Numeric_Row;
-         Jerk_Max                : Numeric_Row;
-         Snap_Max                : Numeric_Row;
-         Crackle_Max             : Numeric_Row;
-         Chord_Error_Max         : Numeric_Row;
+         Acceleration_Max : Numeric_Row;
+         Jerk_Max         : Numeric_Row;
+         Snap_Max         : Numeric_Row;
+         Crackle_Max      : Numeric_Row;
+         Chord_Error_Max  : Numeric_Row;
       end record;
 
       type Stepper_Rows is array (Stepper_Name) of Check_Box_Row;
@@ -300,23 +319,27 @@ package GUI.Config_Editor is
       end record;
 
       type Kinematics_Widget is new Parent_Type with record
-         Widget_Table               : Gnoga.Gui.Element.Table.Table_Type;
-         Lower_Pos_Limit_Row        : Parameter_Rows.Parameter_Row;
-         Lower_Pos_Limit_Input      : Grouped_Element_Widgets.Position_Widget;
-         Upper_Pos_Limit_Row        : Parameter_Rows.Parameter_Row;
-         Upper_Pos_Limit_Input      : Grouped_Element_Widgets.Position_Widget;
-         Max_Limits_Row             : Parameter_Rows.Parameter_Row;
-         Max_Limits_Input           : Grouped_Element_Widgets.Kinematic_Limits_Widget;
-         Starting_Limits_Row        : Parameter_Rows.Parameter_Row;
-         Starting_Limits_Input      : Grouped_Element_Widgets.Kinematic_Limits_Widget;
-         Planning_Scaler_Row        : Parameter_Rows.Parameter_Row;
-         Planning_Scaler_Input      : Grouped_Element_Widgets.Position_Scale_Widget;
-         Minimum_Cruise_Ratio_Row   : Parameter_Rows.Parameter_Row;
-         Minimum_Cruise_Ratio_Input : Basic_Inputs.Cruise_Ratio_Input;
-         Z_Steppers_Row             : Parameter_Rows.Parameter_Row;
-         Z_Steppers_Input           : Grouped_Element_Widgets.Attached_Steppers_Widget;
-         E_Steppers_Row             : Parameter_Rows.Parameter_Row;
-         E_Steppers_Input           : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         Widget_Table                          : Gnoga.Gui.Element.Table.Table_Type;
+         Lower_Pos_Limit_Row                   : Parameter_Rows.Parameter_Row;
+         Lower_Pos_Limit_Input                 : Grouped_Element_Widgets.Position_Widget;
+         Upper_Pos_Limit_Row                   : Parameter_Rows.Parameter_Row;
+         Upper_Pos_Limit_Input                 : Grouped_Element_Widgets.Position_Widget;
+         Max_Limits_Row                        : Parameter_Rows.Parameter_Row;
+         Max_Limits_Input                      : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Max_Feedrate_Row                      : Parameter_Rows.Parameter_Row;
+         Max_Feedrate_Input                    : Basic_Inputs.Velocity_Input;
+         Max_Axial_Velocities_Row              : Parameter_Rows.Parameter_Row;
+         Max_Axial_Velocities_Input            : Grouped_Element_Widgets.Axial_Velocities_Widget;
+         Ignore_E_Feedrate_In_XYZE_Moves_Row   : Parameter_Rows.Parameter_Row;
+         Ignore_E_Feedrate_In_XYZE_Moves_Input : Basic_Inputs.Boolean_Input;
+         Planning_Scaler_Row                   : Parameter_Rows.Parameter_Row;
+         Planning_Scaler_Input                 : Grouped_Element_Widgets.Position_Scale_Widget;
+         Minimum_Cruise_Ratio_Row              : Parameter_Rows.Parameter_Row;
+         Minimum_Cruise_Ratio_Input            : Basic_Inputs.Cruise_Ratio_Input;
+         Z_Steppers_Row                        : Parameter_Rows.Parameter_Row;
+         Z_Steppers_Input                      : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         E_Steppers_Row                        : Parameter_Rows.Parameter_Row;
+         E_Steppers_Input                      : Grouped_Element_Widgets.Attached_Steppers_Widget;
 
          Kind_Table : Cards_Table_Type;
 
@@ -359,12 +382,8 @@ package GUI.Config_Editor is
          Switch_Input               : Basic_Inputs.Input_Switch_Name_Input.Discrete_Input;
          First_Move_Distance_Row    : Parameter_Rows.Parameter_Row;
          First_Move_Distance_Input  : Basic_Inputs.Length_Input;
-         First_Move_Limits_Row      : Parameter_Rows.Parameter_Row;
-         First_Move_Limits_Input    : Grouped_Element_Widgets.Kinematic_Limits_Widget;
          Second_Move_Distance_Row   : Parameter_Rows.Parameter_Row;
          Second_Move_Distance_Input : Basic_Inputs.Length_Input;
-         Second_Move_Limits_Row     : Parameter_Rows.Parameter_Row;
-         Second_Move_Limits_Input   : Grouped_Element_Widgets.Kinematic_Limits_Widget;
          Switch_Position_Row        : Parameter_Rows.Parameter_Row;
          Switch_Position_Input      : Basic_Inputs.Length_Input;
 
@@ -434,19 +453,19 @@ package GUI.Config_Editor is
 
          No_Mesh_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
 
-         Beacon_Table              : aliased Gnoga.Gui.Element.Table.Table_Type;
-         Serial_Port_Path_Row      : Parameter_Rows.Parameter_Row;
-         Serial_Port_Path_Input    : Basic_Inputs.Path_String_Input;
-         X_Offset_Row              : Parameter_Rows.Parameter_Row;
-         X_Offset_Input            : Basic_Inputs.Length_Input;
-         Y_Offset_Row              : Parameter_Rows.Parameter_Row;
-         Y_Offset_Input            : Basic_Inputs.Length_Input;
-         Calibration_Floor_Row     : Parameter_Rows.Parameter_Row;
-         Calibration_Floor_Input   : Basic_Inputs.Length_Input;
-         Calibration_Ceiling_Row   : Parameter_Rows.Parameter_Row;
-         Calibration_Ceiling_Input : Basic_Inputs.Length_Input;
-         Calibration_Limits_Row    : Parameter_Rows.Parameter_Row;
-         Calibration_Limits_Input  : Grouped_Element_Widgets.Kinematic_Limits_Widget;
+         Beacon_Table               : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Serial_Port_Path_Row       : Parameter_Rows.Parameter_Row;
+         Serial_Port_Path_Input     : Basic_Inputs.Path_String_Input;
+         X_Offset_Row               : Parameter_Rows.Parameter_Row;
+         X_Offset_Input             : Basic_Inputs.Length_Input;
+         Y_Offset_Row               : Parameter_Rows.Parameter_Row;
+         Y_Offset_Input             : Basic_Inputs.Length_Input;
+         Calibration_Floor_Row      : Parameter_Rows.Parameter_Row;
+         Calibration_Floor_Input    : Basic_Inputs.Length_Input;
+         Calibration_Ceiling_Row    : Parameter_Rows.Parameter_Row;
+         Calibration_Ceiling_Input  : Basic_Inputs.Length_Input;
+         Calibration_Feedrate_Row   : Parameter_Rows.Parameter_Row;
+         Calibration_Feedrate_Input : Basic_Inputs.Velocity_Input;
 
          Submit_Button : Gnoga.Gui.Element.Form.Submit_Button_Type;
       end record;

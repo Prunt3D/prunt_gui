@@ -35,22 +35,22 @@ package body GUI.Config_Editor is
 
       function Get (Input : Length_Input) return Physical_Types.Length is
       begin
-         return Physical_Types.Length'Value (Input.Value.To_Latin_1);
+         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * mm;
       end Get;
 
       procedure Set (Input : in out Length_Input; Value : Physical_Types.Length) is
       begin
-         Input.Value (Image (Value));
+         Input.Value (Image (Value / mm));
       end Set;
 
       function Get (Input : Time_Input) return Time is
       begin
-         return Time'Value (Input.Value.To_Latin_1);
+         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * s;
       end Get;
 
       procedure Set (Input : in out Time_Input; Value : Time) is
       begin
-         Input.Value (Image (Value));
+         Input.Value (Image (Value / s));
       end Set;
 
       function Get (Input : Cruise_Ratio_Input) return Cruise_Ratio is
@@ -65,12 +65,12 @@ package body GUI.Config_Editor is
 
       function Get (Input : Temperature_Input) return Temperature is
       begin
-         return Temperature'Value (Input.Value.To_Latin_1);
+         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * celcius;
       end Get;
 
       procedure Set (Input : in out Temperature_Input; Value : Temperature) is
       begin
-         Input.Value (Image (Value));
+         Input.Value (Image (Value / celcius));
       end Set;
 
       function Get (Input : Dimensionless_Input) return Dimensionless is
@@ -95,12 +95,22 @@ package body GUI.Config_Editor is
 
       function Get (Input : Voltage_Input) return Voltage is
       begin
-         return Voltage'Value (Input.Value.To_Latin_1);
+         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * volt;
       end Get;
 
       procedure Set (Input : in out Voltage_Input; Value : Voltage) is
       begin
-         Input.Value (Image (Value));
+         Input.Value (Image (Value / volt));
+      end Set;
+
+      function Get (Input : Velocity_Input) return Velocity is
+      begin
+         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * mm / s;
+      end Get;
+
+      procedure Set (Input : in out Velocity_Input; Value : Velocity) is
+      begin
+         Input.Value (Image (Value / (mm / s)));
       end Set;
 
       function Get (Input : Path_String_Input) return Path_Strings.Bounded_String is
@@ -212,7 +222,7 @@ package body GUI.Config_Editor is
          Pos : Physical_Types.Position;
       begin
          for I in Pos'Range loop
-            Pos (I) := Physical_Types.Length'Value (Widget.Rows (I).Input.Value.To_Latin_1);
+            Pos (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_Latin_1) * mm;
          end loop;
 
          return Pos;
@@ -221,7 +231,7 @@ package body GUI.Config_Editor is
       procedure Set (Widget : in out Position_Widget; Pos : Physical_Types.Position) is
       begin
          for I in Pos'Range loop
-            Widget.Rows (I).Input.Value (Image (Pos (I)));
+            Widget.Rows (I).Input.Value (Image (Pos (I) / mm));
          end loop;
       end Set;
 
@@ -256,6 +266,36 @@ package body GUI.Config_Editor is
       end Set;
 
       procedure Create
+        (Widget : in out Axial_Velocities_Widget;
+         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
+         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
+         ID     :        UXString := "")
+      is
+      begin
+         Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
+         for I in Widget.Rows'Range loop
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & " (mm / s):"));
+         end loop;
+      end Create;
+
+      function Get (Widget : Axial_Velocities_Widget) return Physical_Types.Axial_Velocities is
+         Vels : Physical_Types.Axial_Velocities;
+      begin
+         for I in Vels'Range loop
+            Vels (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_Latin_1) * mm / s;
+         end loop;
+
+         return Vels;
+      end Get;
+
+      procedure Set (Widget : in out Axial_Velocities_Widget; Vels : Physical_Types.Axial_Velocities) is
+      begin
+         for I in Vels'Range loop
+            Widget.Rows (I).Input.Value (Image (Vels (I) / (mm / s)));
+         end loop;
+      end Set;
+
+      procedure Create
         (Widget : in out Kinematic_Limits_Widget;
          Parent : in out Gnoga.Gui.Element.Element_Type'Class;
          Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
@@ -263,7 +303,6 @@ package body GUI.Config_Editor is
       is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
-         Widget.Tangential_Velocity_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Velocity:"));
          Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Acceleration:"));
          Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Jerk:"));
          Widget.Snap_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Snap:"));
@@ -274,17 +313,15 @@ package body GUI.Config_Editor is
       function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits is
       begin
          return
-           (Tangential_Velocity_Max => Velocity'Value (Widget.Tangential_Velocity_Max.Input.Value.To_Latin_1),
-            Acceleration_Max        => Acceleration'Value (Widget.Acceleration_Max.Input.Value.To_Latin_1),
-            Jerk_Max                => Jerk'Value (Widget.Jerk_Max.Input.Value.To_Latin_1),
-            Snap_Max                => Snap'Value (Widget.Snap_Max.Input.Value.To_Latin_1),
-            Crackle_Max             => Crackle'Value (Widget.Crackle_Max.Input.Value.To_Latin_1),
-            Chord_Error_Max         => Physical_Types.Length'Value (Widget.Chord_Error_Max.Input.Value.To_Latin_1));
+           (Acceleration_Max => Acceleration'Value (Widget.Acceleration_Max.Input.Value.To_Latin_1),
+            Jerk_Max         => Jerk'Value (Widget.Jerk_Max.Input.Value.To_Latin_1),
+            Snap_Max         => Snap'Value (Widget.Snap_Max.Input.Value.To_Latin_1),
+            Crackle_Max      => Crackle'Value (Widget.Crackle_Max.Input.Value.To_Latin_1),
+            Chord_Error_Max  => Physical_Types.Length'Value (Widget.Chord_Error_Max.Input.Value.To_Latin_1));
       end Get;
 
       procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits) is
       begin
-         Widget.Tangential_Velocity_Max.Input.Value (Image (Limits.Tangential_Velocity_Max));
          Widget.Acceleration_Max.Input.Value (Image (Limits.Acceleration_Max));
          Widget.Jerk_Max.Input.Value (Image (Limits.Jerk_Max));
          Widget.Snap_Max.Input.Value (Image (Limits.Snap_Max));
@@ -526,23 +563,38 @@ package body GUI.Config_Editor is
          View.Max_Limits_Row.Create
            (Parent      => View.Widget_Table,
             Name        => "Max_Limits:",
-            Description =>
-              "Maximum motion profile limits. Any limits set higher than these by g-code will be clipped.",
+            Description => "Maximum motion profile limits.",
             Data        => View.Max_Limits_Input);
 
-         View.Starting_Limits_Input.Create (Parent => View.Widget_Table, Form => View);
-         View.Starting_Limits_Row.Create
+         View.Max_Feedrate_Input.Create (Form => View);
+         View.Max_Feedrate_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Starting_Limits:",
-            Description => "Starting motion profile limits before any limits are set by g-code.",
-            Data        => View.Starting_Limits_Input);
+            Name        => "Max_Feedrate:",
+            Description => "Maximum tangential feedrate. Feedrates higher than this value will be clipped.",
+            Data        => View.Max_Feedrate_Input);
+
+         View.Max_Axial_Velocities_Input.Create (Parent => View.Widget_Table, Form => View);
+         View.Max_Axial_Velocities_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max_Axial_Velocities:",
+            Description =>
+              "Maximum axial velocities. Feedrates that result in axial velocities higher than these values will be clipped.",
+            Data        => View.Max_Axial_Velocities_Input);
+
+         View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Create (Form => View);
+         View.Ignore_E_Feedrate_In_XYZE_Moves_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Ignore_E_Feedrate_In_XYZE_Moves:",
+            Description =>
+              "Ignore the E axis unless it is the only axis involved in a move. This behaviour in some other motion controllers.",
+            Data        => View.Ignore_E_Feedrate_In_XYZE_Moves_Input);
 
          View.Planning_Scaler_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Planning_Scaler_Row.Create
            (Parent      => View.Widget_Table,
             Name        => "Planning_Scaler:",
             Description =>
-              "Inside the motion planner, all positions are multiples by this value before applying motion profile limits, allowing for different limits on different axes. You do not need to take this value in to account when setting position limits or mm per step values.",
+              "Inside the motion planner, all positions are multiples by this value before applying motion profile limits, allowing for different limits on different axes. You do not need to take this value in to account when setting position limits or mm per step values. Feedrates are computed based on the real positions, not the scaled positions.",
             Data        => View.Planning_Scaler_Input);
 
          View.Minimum_Cruise_Ratio_Input.Create (Form => View);
@@ -631,7 +683,9 @@ package body GUI.Config_Editor is
          View.Lower_Pos_Limit_Input.Set (Params.Lower_Pos_Limit);
          View.Upper_Pos_Limit_Input.Set (Params.Upper_Pos_Limit);
          View.Max_Limits_Input.Set (Params.Max_Limits);
-         View.Starting_Limits_Input.Set (Params.Starting_Limits);
+         View.Max_Feedrate_Input.Set (Params.Max_Feedrate);
+         View.Max_Axial_Velocities_Input.Set (Params.Max_Axial_Velocities);
+         View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Set (Params.Ignore_E_Feedrate_In_XYZE_Moves);
          View.Planning_Scaler_Input.Set (Params.Planning_Scaler);
          View.Minimum_Cruise_Ratio_Input.Set (Params.Minimum_Cruise_Ratio);
          View.Z_Steppers_Input.Set (Params.Z_Steppers);
@@ -653,14 +707,16 @@ package body GUI.Config_Editor is
             raise Constraint_Error with "Kinematics type must be selected.";
          end if;
 
-         Params.Lower_Pos_Limit      := View.Lower_Pos_Limit_Input.Get;
-         Params.Upper_Pos_Limit      := View.Upper_Pos_Limit_Input.Get;
-         Params.Max_Limits           := View.Max_Limits_Input.Get;
-         Params.Starting_Limits      := View.Starting_Limits_Input.Get;
-         Params.Planning_Scaler      := View.Planning_Scaler_Input.Get;
-         Params.Minimum_Cruise_Ratio := View.Minimum_Cruise_Ratio_Input.Get;
-         Params.Z_Steppers           := View.Z_Steppers_Input.Get;
-         Params.E_Steppers           := View.E_Steppers_Input.Get;
+         Params.Lower_Pos_Limit                 := View.Lower_Pos_Limit_Input.Get;
+         Params.Upper_Pos_Limit                 := View.Upper_Pos_Limit_Input.Get;
+         Params.Max_Limits                      := View.Max_Limits_Input.Get;
+         Params.Max_Feedrate                    := View.Max_Feedrate_Input.Get;
+         Params.Max_Axial_Velocities            := View.Max_Axial_Velocities_Input.Get;
+         Params.Ignore_E_Feedrate_In_XYZE_Moves := View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Get;
+         Params.Planning_Scaler                 := View.Planning_Scaler_Input.Get;
+         Params.Minimum_Cruise_Ratio            := View.Minimum_Cruise_Ratio_Input.Get;
+         Params.Z_Steppers                      := View.Z_Steppers_Input.Get;
+         Params.E_Steppers                      := View.E_Steppers_Input.Get;
 
          My_Config.Config_File.Write (Params);
 
@@ -753,13 +809,6 @@ package body GUI.Config_Editor is
               "The minimum length of the first move, may be negative to home towards negative infinity. The axis will first move twice this far away from the homing direction iff the switch is hit. The axis will then move at least this far in total, and no further than this far after the switch is hit. The axis will then move twice this far away from the switch before the second move.",
             Data        => View.First_Move_Distance_Input);
 
-         View.First_Move_Limits_Input.Create (Parent => View.Double_Tap_Table, Form => View);
-         View.First_Move_Limits_Row.Create
-           (Parent      => View.Double_Tap_Table,
-            Name        => "First_Move_Limits:",
-            Description => "The motion profile limits for the first move.",
-            Data        => View.First_Move_Limits_Input);
-
          View.Second_Move_Distance_Input.Create (Form => View);
          View.Second_Move_Distance_Row.Create
            (Parent      => View.Double_Tap_Table,
@@ -767,13 +816,6 @@ package body GUI.Config_Editor is
             Description =>
               "The minimum length of the second move, may be negative to home towards negative infinity, must be the same sign as the first distance. The axis will move at least this far in total, and no further than this far after the switch is hit.",
             Data        => View.Second_Move_Distance_Input);
-
-         View.Second_Move_Limits_Input.Create (Parent => View.Double_Tap_Table, Form => View);
-         View.Second_Move_Limits_Row.Create
-           (Parent      => View.Double_Tap_Table,
-            Name        => "Second_Move_Limits:",
-            Description => "The motion profile limits for the second move.",
-            Data        => View.Second_Move_Limits_Input);
 
          View.Switch_Position_Input.Create (Form => View);
          View.Switch_Position_Row.Create
@@ -812,9 +854,7 @@ package body GUI.Config_Editor is
                View.Kind_Table.Tabs.Select_Tab ("Double_Tap");
                View.Switch_Input.Set (Params.Switch);
                View.First_Move_Distance_Input.Set (Params.First_Move_Distance);
-               View.First_Move_Limits_Input.Set (Params.First_Move_Limits);
                View.Second_Move_Distance_Input.Set (Params.Second_Move_Distance);
-               View.Second_Move_Limits_Input.Set (Params.Second_Move_Limits);
                View.Switch_Position_Input.Set (Params.Switch_Position);
             when Set_To_Value_Kind =>
                View.Kind_Table.Tabs.Select_Tab ("Set_To_Value");
@@ -829,9 +869,7 @@ package body GUI.Config_Editor is
             Params                      := (Kind => Double_Tap_Kind, others => <>);
             Params.Switch               := View.Switch_Input.Get;
             Params.First_Move_Distance  := View.First_Move_Distance_Input.Get;
-            Params.First_Move_Limits    := View.First_Move_Limits_Input.Get;
             Params.Second_Move_Distance := View.Second_Move_Distance_Input.Get;
-            Params.Second_Move_Limits   := View.Second_Move_Limits_Input.Get;
             Params.Switch_Position      := View.Switch_Position_Input.Get;
          elsif View.Kind_Table.Cards.Current_Card = View.Set_To_Value_Table'Unrestricted_Access then
             Params       := (Kind => Set_To_Value_Kind, others => <>);
@@ -1128,13 +1166,12 @@ package body GUI.Config_Editor is
             Description => "Z axis value to use for highest calibration point.",
             Data        => View.Calibration_Ceiling_Input);
 
-         View.Calibration_Limits_Input.Create (Parent => View.Beacon_Table, Form => View);
-         View.Calibration_Limits_Row.Create
+         View.Calibration_Feedrate_Input.Create (Form => View);
+         View.Calibration_Feedrate_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Calibration_Limits:",
-            Description =>
-              "Motion profile limits to use during calibration. If using a scaler for the Z axis, you should increase this value to have a real velocity of around 1 mm/s.",
-            Data        => View.Calibration_Limits_Input);
+            Name        => "Calibration_Feedrate (mm / s):",
+            Description => "Feedrate used for calibration sequence.",
+            Data        => View.Calibration_Feedrate_Input);
 
          View.Read_Data;
 
@@ -1158,7 +1195,7 @@ package body GUI.Config_Editor is
                View.Y_Offset_Input.Set (Params.Y_Offset);
                View.Calibration_Floor_Input.Set (Params.Calibration_Floor);
                View.Calibration_Ceiling_Input.Set (Params.Calibration_Ceiling);
-               View.Calibration_Limits_Input.Set (Params.Calibration_Limits);
+               View.Calibration_Feedrate_Input.Set (Params.Calibration_Feedrate);
          end case;
       end Read_Data;
 
@@ -1168,13 +1205,13 @@ package body GUI.Config_Editor is
          if View.Kind_Table.Cards.Current_Card = View.No_Mesh_Table'Unrestricted_Access then
             Params := (Kind => No_Mesh_Kind, others => <>);
          elsif View.Kind_Table.Cards.Current_Card = View.Beacon_Table'Unrestricted_Access then
-            Params                     := (Kind => Beacon_Kind, others => <>);
-            Params.Serial_Port_Path    := View.Serial_Port_Path_Input.Get;
-            Params.X_Offset            := View.X_Offset_Input.Get;
-            Params.Y_Offset            := View.Y_Offset_Input.Get;
-            Params.Calibration_Floor   := View.Calibration_Floor_Input.Get;
-            Params.Calibration_Ceiling := View.Calibration_Ceiling_Input.Get;
-            Params.Calibration_Limits  := View.Calibration_Limits_Input.Get;
+            Params                      := (Kind => Beacon_Kind, others => <>);
+            Params.Serial_Port_Path     := View.Serial_Port_Path_Input.Get;
+            Params.X_Offset             := View.X_Offset_Input.Get;
+            Params.Y_Offset             := View.Y_Offset_Input.Get;
+            Params.Calibration_Floor    := View.Calibration_Floor_Input.Get;
+            Params.Calibration_Ceiling  := View.Calibration_Ceiling_Input.Get;
+            Params.Calibration_Feedrate := View.Calibration_Feedrate_Input.Get;
          else
             raise Constraint_Error with "Bed_Mesh type must be selected.";
          end if;
