@@ -213,7 +213,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & ":"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & " (mm):"));
          end loop;
       end Create;
 
@@ -302,30 +302,30 @@ package body GUI.Config_Editor is
       is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
-         Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Acceleration:"));
-         Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Jerk:"));
-         Widget.Snap_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Snap:"));
-         Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Crackle:"));
-         Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Deviation:"));
+         Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Acceleration (mm / s**2):"));
+         Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Jerk (mm / s**3):"));
+         Widget.Snap_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Snap (mm / s**4):"));
+         Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Crackle (mm / s**5):"));
+         Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Deviation (mm):"));
       end Create;
 
       function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits is
       begin
          return
-           (Acceleration_Max => Acceleration'Value (Widget.Acceleration_Max.Input.Value.To_Latin_1),
-            Jerk_Max         => Jerk'Value (Widget.Jerk_Max.Input.Value.To_Latin_1),
-            Snap_Max         => Snap'Value (Widget.Snap_Max.Input.Value.To_Latin_1),
-            Crackle_Max      => Crackle'Value (Widget.Crackle_Max.Input.Value.To_Latin_1),
-            Chord_Error_Max  => Physical_Types.Length'Value (Widget.Chord_Error_Max.Input.Value.To_Latin_1));
+           (Acceleration_Max => Dimensionless'Value (Widget.Acceleration_Max.Input.Value.To_Latin_1) * mm / s**2,
+            Jerk_Max         => Dimensionless'Value (Widget.Jerk_Max.Input.Value.To_Latin_1) * mm / s**3,
+            Snap_Max         => Dimensionless'Value (Widget.Snap_Max.Input.Value.To_Latin_1) * mm / s**4,
+            Crackle_Max      => Dimensionless'Value (Widget.Crackle_Max.Input.Value.To_Latin_1) * mm / s**5,
+            Chord_Error_Max  => Dimensionless'Value (Widget.Chord_Error_Max.Input.Value.To_Latin_1) * mm);
       end Get;
 
       procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits) is
       begin
-         Widget.Acceleration_Max.Input.Value (Image (Limits.Acceleration_Max));
-         Widget.Jerk_Max.Input.Value (Image (Limits.Jerk_Max));
-         Widget.Snap_Max.Input.Value (Image (Limits.Snap_Max));
-         Widget.Crackle_Max.Input.Value (Image (Limits.Crackle_Max));
-         Widget.Chord_Error_Max.Input.Value (Image (Limits.Chord_Error_Max));
+         Widget.Acceleration_Max.Input.Value (Image (Limits.Acceleration_Max / (mm / s**2)));
+         Widget.Jerk_Max.Input.Value (Image (Limits.Jerk_Max / (mm / s**3)));
+         Widget.Snap_Max.Input.Value (Image (Limits.Snap_Max / (mm / s**4)));
+         Widget.Crackle_Max.Input.Value (Image (Limits.Crackle_Max / (mm / s**5)));
+         Widget.Chord_Error_Max.Input.Value (Image (Limits.Chord_Error_Max / mm));
       end Set;
 
       procedure Create
