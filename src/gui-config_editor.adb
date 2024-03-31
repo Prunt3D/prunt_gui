@@ -1,4 +1,3 @@
-with Physical_Types; use Physical_Types;
 with PragmARC.Images;
 with Ada.Exceptions;
 with Ada.Strings;
@@ -451,7 +450,9 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Enabled:",
             Description =>
-              "If set, enable outputs to the stepper and allows it to be used for motion. A stepper that is not enabled will never output any signals. On some boards the outputs may be high impedance in this state.",
+              "If set, enable outputs to the stepper and allows it to be used for motion. " &
+              "A stepper that is not enabled will never output any signals. " &
+              "On some boards the outputs may be high impedance in this state.",
             Data        => View.Enabled_Input);
 
          View.Invert_Direction_Input.Create (Form => View);
@@ -480,7 +481,12 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Mm_Per_Step (mm):",
             Description =>
-              "The distance moved by the stepper for each transition of the step signal. Note that this is the distance for each transition, not the distance for each complete cycle. For stepper drivers that only step on either the rising or falling edge, take the average value for each transition (mm per cycle / 2). Note that Prunt will always output steps in groups of two in the default configuration, so direction signals will always be output on the same step signal state.",
+              "The distance moved by the stepper for each transition of the step signal. " &
+              "Note that this is the distance for each transition, not the distance for each complete cycle. " &
+              "For stepper drivers that only step on either the rising or falling edge, " &
+              "take the average value for each transition (mm per cycle / 2). " &
+              "Note that Prunt will always output steps in groups of two in the default configuration, " &
+              "so direction signals will always be output on the same step signal state.",
             Data        => View.Mm_Per_Step_Input);
 
          View.Direction_Setup_Time_Input.Create (Form => View);
@@ -495,7 +501,11 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Step_Time (s):",
             Description =>
-              "Time between any step transitions on this stepper. These limits will be enforced even if the commanded feedrate is faster, resulting in a discontinuity in acceleration if the limits are reached. The limits are also enforced if the step generator needs to catch up in case the step generation task is interrupted or is overloaded.",
+              "Time between any step transitions on this stepper. " &
+              "These limits will be enforced even if the commanded feedrate is faster, " &
+              "resulting in a discontinuity in acceleration if the limits are reached. " &
+              "The limits are also enforced if the step generator needs to catch up " &
+              "in case the step generation task is interrupted or is overloaded.",
             Data        => View.Step_Time_Input);
 
          View.Read_Data;
@@ -578,7 +588,8 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Max_Axial_Velocities:",
             Description =>
-              "Maximum axial velocities. Feedrates that result in axial velocities higher than these values will be clipped.",
+              "Maximum axial velocities. " &
+              "Feedrates that result in axial velocities higher than these values will be clipped.",
             Data        => View.Max_Axial_Velocities_Input);
 
          View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Create (Form => View);
@@ -586,7 +597,8 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Ignore_E_Feedrate_In_XYZE_Moves:",
             Description =>
-              "Ignore the E axis unless it is the only axis involved in a move. This behaviour in some other motion controllers.",
+              "Ignore the E axis unless it is the only axis involved in a move. " &
+              "This behaviour in some other motion controllers.",
             Data        => View.Ignore_E_Feedrate_In_XYZE_Moves_Input);
 
          View.Planning_Scaler_Input.Create (Parent => View.Widget_Table, Form => View);
@@ -594,7 +606,11 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Planning_Scaler:",
             Description =>
-              "Inside the motion planner, all positions are multiples by this value before applying motion profile limits, allowing for different limits on different axes. You do not need to take this value in to account when setting position limits or mm per step values. Feedrates are computed based on the real positions, not the scaled positions.",
+              "Inside the motion planner, " &
+              "all positions are multiples by this value before applying motion profile limits, " &
+              "allowing for different limits on different axes. " &
+              "You do not need to take this value in to account when setting position limits or mm per step values. " &
+              "Feedrates are computed based on the real positions, not the scaled positions.",
             Data        => View.Planning_Scaler_Input);
 
          View.Minimum_Cruise_Ratio_Input.Create (Form => View);
@@ -806,7 +822,11 @@ package body GUI.Config_Editor is
            (Parent      => View.Double_Tap_Table,
             Name        => "First_Move_Distance (mm):",
             Description =>
-              "The minimum length of the first move, may be negative to home towards negative infinity. The axis will first move twice this far away from the homing direction iff the switch is hit. The axis will then move at least this far in total, and no further than this far after the switch is hit. The axis will then move twice this far away from the switch before the second move.",
+              "The minimum length of the first move, may be negative to home towards negative infinity. " &
+              "The axis will first move twice this far away from the homing direction iff the switch is hit. " &
+              "The axis will then move at least this far in total, " &
+              "and no further than this far after the switch is hit. " &
+              "The axis will then move twice this far away from the switch before the second move.",
             Data        => View.First_Move_Distance_Input);
 
          View.Second_Move_Distance_Input.Create (Form => View);
@@ -814,7 +834,9 @@ package body GUI.Config_Editor is
            (Parent      => View.Double_Tap_Table,
             Name        => "Second_Move_Distance (mm):",
             Description =>
-              "The minimum length of the second move, may be negative to home towards negative infinity, must be the same sign as the first distance. The axis will move at least this far in total, and no further than this far after the switch is hit.",
+              "The minimum length of the second move, may be negative to home towards negative infinity, " &
+              "must be the same sign as the first distance. " & "The axis will move at least this far in total, " &
+              "and no further than this far after the switch is hit.",
             Data        => View.Second_Move_Distance_Input);
 
          View.Switch_Position_Input.Create (Form => View);
@@ -908,7 +930,10 @@ package body GUI.Config_Editor is
            (Parent      => View.Widget_Table,
             Name        => "Starting_Pressure_Advance_Time (s):",
             Description =>
-              "The initial pressure advance time before a value is set by g-code. There is no equivalent of smoothing time as used by other motion controllers as the use of crackle-limited motion planning prevents the discontinuity in velocity that would otherwise be present. There is instead a discontinuity in snap.",
+              "The initial pressure advance time before a value is set by g-code. " &
+              "There is no equivalent of smoothing time as used by other motion controllers as the use of " &
+              "crackle-limited motion planning prevents the discontinuity in velocity " &
+              "that would otherwise be present. There is instead a discontinuity in snap.",
             Data        => View.Starting_Pressure_Advance_Time_Input);
 
          View.Read_Data;
@@ -1059,7 +1084,8 @@ package body GUI.Config_Editor is
            (Parent      => View.Bang_Bang_Table,
             Name        => UXStrings.From_UTF_8 ("Max_Delta (°C):"),
             Description =>
-              "Maximum temperature below or above the target temperature where the heater will be switched on or off respectively.",
+              "Maximum temperature below or above the target temperature where " &
+              "the heater will be switched on or off respectively.",
             Data        => View.Max_Delta_Input);
 
          View.Read_Data;
@@ -1203,7 +1229,7 @@ package body GUI.Config_Editor is
          Params : Bed_Mesh_Parameters;
       begin
          if View.Kind_Table.Cards.Current_Card = View.No_Mesh_Table'Unrestricted_Access then
-            Params := (Kind => No_Mesh_Kind, others => <>);
+            Params := (Kind => No_Mesh_Kind);
          elsif View.Kind_Table.Cards.Current_Card = View.Beacon_Table'Unrestricted_Access then
             Params                      := (Kind => Beacon_Kind, others => <>);
             Params.Serial_Port_Path     := View.Serial_Port_Path_Input.Get;
@@ -1337,7 +1363,7 @@ package body GUI.Config_Editor is
          Params : Fan_Parameters;
       begin
          if View.Kind_Table.Cards.Current_Card = View.Disabled_Table'Unrestricted_Access then
-            Params := (Kind => Disabled_Kind, others => <>);
+            Params := (Kind => Disabled_Kind);
          elsif View.Kind_Table.Cards.Current_Card = View.Dynamic_PWM_Table'Unrestricted_Access then
             Params                   := (Kind => Dynamic_PWM_Kind, others => <>);
             Params.Disable_Below_PWM := View.Disable_Below_PWM_Input.Get;

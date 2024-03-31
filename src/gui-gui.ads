@@ -2,19 +2,13 @@ with Physical_Types; use Physical_Types;
 with Config.Config;
 private with GUI.Config_Editor;
 with Gnoga.Types;
-with Gnoga.Application.Multi_Connect;
-with Gnoga.Gui.Base;
 with Gnoga.Gui.Window;
 with Gnoga.Gui.View;
 with Gnoga.Gui.Element.Common;
-with Gnoga.Gui.Element.Form;
 with Gnoga.Gui.View.Console;
-with Gnoga.Gui.View.Card;
-with Gnoga.Gui.View.Docker;
 with Gnoga.Gui.Element.Table;
 with GUI.Cards_Table; use GUI.Cards_Table;
 with UXStrings;       use UXStrings;
-with Physical_Types;  use Physical_Types;
 
 generic
    with package My_Config is new Config.Config (<>);

@@ -3,7 +3,6 @@ with Gnoga.Gui.Element.Form;
 with Gnoga.Gui.Element.Table;
 with Gnoga.Gui.Element.Common;
 with Gnoga.Gui.Element;
-with Gnoga.Gui.View;
 with Config.Config;
 with UXStrings;       use UXStrings;
 with Gnoga.Types;

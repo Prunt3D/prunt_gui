@@ -1,4 +1,6 @@
 with Ada.Unchecked_Deallocation;
+with Gnoga.Application.Multi_Connect;
+with Gnoga.Gui.View.Card;
 
 package body GUI.GUI is
 
@@ -53,12 +55,6 @@ package body GUI.GUI is
       end loop;
    end Status_Updater;
 
-   procedure On_Exit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
-      App : constant App_Access := App_Access (Object.Connection_Data);
-   begin
-      Gnoga.Application.Multi_Connect.End_Application;
-   end On_Exit;
-
    procedure On_Connect
      (Main_Window : in out Gnoga.Gui.Window.Window_Type'Class;
       Connection  :        access Gnoga.Application.Multi_Connect.Connection_Holder_Type)
@@ -77,7 +73,9 @@ package body GUI.GUI is
 
       App.Loading_Div.Create
         (App.Main_Window.all,
-         "<h1>Loading, please wait.</h1><p>If this takes more than a few seconds then it is likely that something has gone wrong, check the console output.</p>");
+         "<h1>Loading, please wait.</h1>" &
+         "<p>If this takes more than a few seconds then it is likely that something has gone wrong," &
+         "check the console output.</p>");
       App.Loading_Div.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
 
       App.Main_Table.Create (App.Main_Window.all);
