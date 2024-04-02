@@ -1,6 +1,7 @@
 with Ada.Unchecked_Deallocation;
 with Gnoga.Application.Multi_Connect;
 with Gnoga.Gui.View.Card;
+with Gnoga.Gui.Base;
 
 package body GUI.GUI is
 
@@ -64,6 +65,20 @@ package body GUI.GUI is
       App : App_Access := new App_Data;
 
       procedure Free_Data is new Ada.Unchecked_Deallocation (App_Data, App_Access);
+
+      procedure On_Manual_Gcode_Submit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
+         Command   : UXString := App.Manual_Gcode_Form_Entry.Value;
+         Succeeded : Boolean;
+      begin
+         Submit_Gcode (To_Latin_1 (Command), Succeeded);
+         if Succeeded then
+            App.Manual_Gcode_Log.Put_Line (To_HTML (Command));
+            App.Manual_Gcode_Form_Entry.Value ("");
+         else
+            App.Manual_Gcode_Log.Put_Line
+              (From_Latin_1 ("Commands can not run while other commands or files are running."));
+         end if;
+      end On_Manual_Gcode_Submit;
    begin
       Main_Window.Connection_Data (Data => App, Dynamic => False);
 
@@ -74,7 +89,7 @@ package body GUI.GUI is
       App.Loading_Div.Create
         (App.Main_Window.all,
          "<h1>Loading, please wait.</h1>" &
-         "<p>If this takes more than a few seconds then it is likely that something has gone wrong," &
+         "<p>If this takes more than a few seconds then it is likely that something has gone wrong, " &
          "check the console output.</p>");
       App.Loading_Div.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
 
@@ -203,10 +218,28 @@ package body GUI.GUI is
 
       end;
 
+      -- G-Code Console
+      begin
+         App.Manual_Gcode_Table.Create (App.Main_Table.Cards);
+
+         App.Manual_Gcode_Log_Row.Create (App.Manual_Gcode_Table);
+         App.Manual_Gcode_Log.Create (App.Manual_Gcode_Log_Row);
+         App.Manual_Gcode_Log.Style ("height", "500px");
+
+         App.Manual_Gcode_Form_Row.Create (App.Manual_Gcode_Table);
+         App.Manual_Gcode_Form_Div.Create (App.Manual_Gcode_Form_Row);
+         App.Manual_Gcode_Form.Create (App.Manual_Gcode_Form_Div);
+         App.Manual_Gcode_Form_Entry.Create (App.Manual_Gcode_Form, Size => 40);
+         App.Manual_Gcode_Form_Submit_Button.Create (App.Manual_Gcode_Form, Value => "Submit");
+         App.Manual_Gcode_Form.On_Submit_Handler (On_Manual_Gcode_Submit'Unrestricted_Access);
+
+         App.Main_Table.Add_Tab ("G-Code Console", App.Manual_Gcode_Table'Access);
+      end;
+
       --  Log
       begin
          App.Log_Widget.Create (App.Main_Table.Cards);
-         App.Log_Widget.Style ("max-height", "500px");
+         App.Log_Widget.Style ("height", "500px");
          App.Main_Table.Add_Tab ("Log", App.Log_Widget'Access);
       end;
 

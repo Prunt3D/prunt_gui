@@ -5,6 +5,7 @@ with Gnoga.Types;
 with Gnoga.Gui.Window;
 with Gnoga.Gui.View;
 with Gnoga.Gui.Element.Common;
+with Gnoga.Gui.Element.Form;
 with Gnoga.Gui.View.Console;
 with Gnoga.Gui.Element.Table;
 with GUI.Cards_Table; use GUI.Cards_Table;
@@ -14,7 +15,7 @@ generic
    with package My_Config is new Config.Config (<>);
    with function Get_Status_Message return String;
    with function Get_Position return Physical_Types.Position;
-   --  with procedure Submit_Gcode (Command : String; Result : out String);
+   with procedure Submit_Gcode (Command : String; Succeeded : out Boolean);
 package GUI.GUI is
 
    procedure Run;
@@ -67,6 +68,15 @@ private
       Status_Message_Text  : aliased Gnoga.Gui.Element.Common.DIV_Type;
       Status_Position_Row  : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
       Status_Position_Text : aliased Gnoga.Gui.Element.Common.DIV_Type;
+
+      Manual_Gcode_Table              : aliased Gnoga.Gui.Element.Table.Table_Type;
+      Manual_Gcode_Log_Row            : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Manual_Gcode_Log                : aliased Gnoga.Gui.View.Console.Console_View_Type;
+      Manual_Gcode_Form_Row           : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Manual_Gcode_Form_Div           : aliased Gnoga.Gui.Element.Common.DIV_Type;
+      Manual_Gcode_Form               : aliased Gnoga.Gui.Element.Form.Form_Type;
+      Manual_Gcode_Form_Entry         : aliased Gnoga.Gui.Element.Form.Text_Type;
+      Manual_Gcode_Form_Submit_Button : aliased Gnoga.Gui.Element.Form.Submit_Button_Type;
    end record;
 
    type App_Access is access all App_Data;
