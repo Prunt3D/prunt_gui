@@ -93,6 +93,8 @@ package body GUI.GUI is
          "check the console output.</p>");
       App.Loading_Div.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
 
+      Main_Window.Buffer_Connection (True);
+
       App.Main_Table.Create (App.Main_Window.all);
       App.Main_Table.Hidden (True);
 
@@ -246,6 +248,8 @@ package body GUI.GUI is
       App.Main_Table.Cards.Show_Card ("Status");
       App.Loading_Div.Hidden (True);
       App.Main_Table.Hidden (False);
+
+      Main_Window.Buffer_Connection (False);
 
       Connection.Hold;
 
