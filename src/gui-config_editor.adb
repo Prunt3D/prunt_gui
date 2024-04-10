@@ -17,12 +17,12 @@ package body GUI.Config_Editor is
          if Raw (I) /= '0' then
             if Raw (I) = '.' then
                if I - Raw'First > Dimensioned_Float'Digits + 1 then
-                  return UXStrings.From_Latin_1 (Number'Image).Trim (Ada.Strings.Both);
+                  return UXStrings.From_UTF_8 (Number'Image).Trim (Ada.Strings.Both);
                else
-                  return UXStrings.From_Latin_1 (Raw (Raw'First .. I + 1)).Trim (Ada.Strings.Both);
+                  return UXStrings.From_UTF_8 (Raw (Raw'First .. I + 1)).Trim (Ada.Strings.Both);
                end if;
             else
-               return UXStrings.From_Latin_1 (Raw (Raw'First .. I)).Trim (Ada.Strings.Both);
+               return UXStrings.From_UTF_8 (Raw (Raw'First .. I)).Trim (Ada.Strings.Both);
             end if;
          end if;
       end loop;
@@ -34,7 +34,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Length_Input) return Physical_Types.Length is
       begin
-         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * mm;
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm;
       end Get;
 
       procedure Set (Input : in out Length_Input; Value : Physical_Types.Length) is
@@ -44,7 +44,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Time_Input) return Time is
       begin
-         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * s;
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * s;
       end Get;
 
       procedure Set (Input : in out Time_Input; Value : Time) is
@@ -54,7 +54,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Cruise_Ratio_Input) return Cruise_Ratio is
       begin
-         return Cruise_Ratio'Value (Input.Value.To_Latin_1);
+         return Cruise_Ratio'Value (Input.Value.To_UTF_8);
       end Get;
 
       procedure Set (Input : in out Cruise_Ratio_Input; Value : Cruise_Ratio) is
@@ -64,7 +64,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Temperature_Input) return Temperature is
       begin
-         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * celcius;
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * celcius;
       end Get;
 
       procedure Set (Input : in out Temperature_Input; Value : Temperature) is
@@ -74,7 +74,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Dimensionless_Input) return Dimensionless is
       begin
-         return Dimensionless'Value (Input.Value.To_Latin_1);
+         return Dimensionless'Value (Input.Value.To_UTF_8);
       end Get;
 
       procedure Set (Input : in out Dimensionless_Input; Value : Dimensionless) is
@@ -84,7 +84,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : PWM_Scale_Input) return PWM_Scale is
       begin
-         return PWM_Scale'Value (Input.Value.To_Latin_1);
+         return PWM_Scale'Value (Input.Value.To_UTF_8);
       end Get;
 
       procedure Set (Input : in out PWM_Scale_Input; Value : PWM_Scale) is
@@ -94,7 +94,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Voltage_Input) return Voltage is
       begin
-         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * volt;
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * volt;
       end Get;
 
       procedure Set (Input : in out Voltage_Input; Value : Voltage) is
@@ -104,7 +104,7 @@ package body GUI.Config_Editor is
 
       function Get (Input : Velocity_Input) return Velocity is
       begin
-         return Physical_Types.Dimensionless'Value (Input.Value.To_Latin_1) * mm / s;
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm / s;
       end Get;
 
       procedure Set (Input : in out Velocity_Input; Value : Velocity) is
@@ -114,12 +114,12 @@ package body GUI.Config_Editor is
 
       function Get (Input : Path_String_Input) return Path_Strings.Bounded_String is
       begin
-         return Path_Strings.To_Bounded_String (Input.Value.To_Latin_1);
+         return Path_Strings.To_Bounded_String (Input.Value.To_UTF_8);
       end Get;
 
       procedure Set (Input : in out Path_String_Input; Value : Path_Strings.Bounded_String) is
       begin
-         Input.Value (Value => UXStrings.From_Latin_1 (Path_Strings.To_String (Value)));
+         Input.Value (Value => UXStrings.From_UTF_8 (Path_Strings.To_String (Value)));
       end Set;
 
       function Get (Input : Boolean_Input) return Boolean is
@@ -213,7 +213,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & " (mm):"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & " (mm):"));
          end loop;
       end Create;
 
@@ -221,7 +221,7 @@ package body GUI.Config_Editor is
          Pos : Physical_Types.Position;
       begin
          for I in Pos'Range loop
-            Pos (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_Latin_1) * mm;
+            Pos (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_UTF_8) * mm;
          end loop;
 
          return Pos;
@@ -243,7 +243,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & ":"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & ":"));
          end loop;
       end Create;
 
@@ -251,7 +251,7 @@ package body GUI.Config_Editor is
          Scale : Physical_Types.Position_Scale;
       begin
          for I in Scale'Range loop
-            Scale (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_Latin_1);
+            Scale (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_UTF_8);
          end loop;
 
          return Scale;
@@ -273,7 +273,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image & " (mm / s):"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & " (mm / s):"));
          end loop;
       end Create;
 
@@ -281,7 +281,7 @@ package body GUI.Config_Editor is
          Vels : Physical_Types.Axial_Velocities;
       begin
          for I in Vels'Range loop
-            Vels (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_Latin_1) * mm / s;
+            Vels (I) := Physical_Types.Dimensionless'Value (Widget.Rows (I).Input.Value.To_UTF_8) * mm / s;
          end loop;
 
          return Vels;
@@ -302,21 +302,21 @@ package body GUI.Config_Editor is
       is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
-         Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Acceleration (mm / s**2):"));
-         Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Jerk (mm / s**3):"));
-         Widget.Snap_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Snap (mm / s**4):"));
-         Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Crackle (mm / s**5):"));
-         Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_Latin_1 ("Deviation (mm):"));
+         Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Acceleration (mm / s**2):"));
+         Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Jerk (mm / s**3):"));
+         Widget.Snap_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Snap (mm / s**4):"));
+         Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Crackle (mm / s**5):"));
+         Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Deviation (mm):"));
       end Create;
 
       function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits is
       begin
          return
-           (Acceleration_Max => Dimensionless'Value (Widget.Acceleration_Max.Input.Value.To_Latin_1) * mm / s**2,
-            Jerk_Max         => Dimensionless'Value (Widget.Jerk_Max.Input.Value.To_Latin_1) * mm / s**3,
-            Snap_Max         => Dimensionless'Value (Widget.Snap_Max.Input.Value.To_Latin_1) * mm / s**4,
-            Crackle_Max      => Dimensionless'Value (Widget.Crackle_Max.Input.Value.To_Latin_1) * mm / s**5,
-            Chord_Error_Max  => Dimensionless'Value (Widget.Chord_Error_Max.Input.Value.To_Latin_1) * mm);
+           (Acceleration_Max => Dimensionless'Value (Widget.Acceleration_Max.Input.Value.To_UTF_8) * mm / s**2,
+            Jerk_Max         => Dimensionless'Value (Widget.Jerk_Max.Input.Value.To_UTF_8) * mm / s**3,
+            Snap_Max         => Dimensionless'Value (Widget.Snap_Max.Input.Value.To_UTF_8) * mm / s**4,
+            Crackle_Max      => Dimensionless'Value (Widget.Crackle_Max.Input.Value.To_UTF_8) * mm / s**5,
+            Chord_Error_Max  => Dimensionless'Value (Widget.Chord_Error_Max.Input.Value.To_UTF_8) * mm);
       end Get;
 
       procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits) is
@@ -337,7 +337,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_Latin_1 (I'Image));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image));
          end loop;
       end Create;
 
@@ -382,12 +382,12 @@ package body GUI.Config_Editor is
             exception
                when E : others =>
                   Log_And_Switch_Tab (App, "Read-back failed.");
-                  Log_And_Switch_Tab (App, UXStrings.From_Latin_1 (Ada.Exceptions.Exception_Information (E)));
+                  Log_And_Switch_Tab (App, UXStrings.From_UTF_8 (Ada.Exceptions.Exception_Information (E)));
             end;
          exception
             when E : others =>
                Log_And_Switch_Tab (App, "Save failed.");
-               Log_And_Switch_Tab (App, UXStrings.From_Latin_1 (Ada.Exceptions.Exception_Information (E)));
+               Log_And_Switch_Tab (App, UXStrings.From_UTF_8 (Ada.Exceptions.Exception_Information (E)));
          end Inner;
       begin
          Inner (Outer_Section_Widget'Class (Object));
@@ -432,7 +432,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -542,7 +542,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Stepper);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget (View : in out Kinematics_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class) is
@@ -736,7 +736,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -789,7 +789,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Input_Switch);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -902,7 +902,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Axis);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget (View : in out Extruder_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class) is
@@ -962,7 +962,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -1022,7 +1022,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Thermistor);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -1136,7 +1136,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Heater);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget (View : in out Bed_Mesh_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class) is
@@ -1244,7 +1244,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget
@@ -1383,7 +1383,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params, View.Fan);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
       procedure Create_Widget (View : in out G_Code_Assignment_Widget; Parent : in out Gnoga.Gui.Base.Base_Type'Class)
@@ -1440,7 +1440,7 @@ package body GUI.Config_Editor is
 
          My_Config.Config_File.Write (Params);
 
-         Image := UXStrings.From_Latin_1 (Params'Image);
+         Image := UXStrings.From_UTF_8 (Params'Image);
       end Save_Data;
 
    end Section_Widgets;

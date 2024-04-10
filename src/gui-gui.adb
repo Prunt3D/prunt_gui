@@ -49,9 +49,9 @@ package body GUI.GUI is
             exit;
          or
             delay 0.5;
-            App.Status_Message_Text.Inner_HTML (To_HTML (From_Latin_1 ("Status: " & Get_Status_Message)));
+            App.Status_Message_Text.Inner_HTML (To_HTML (From_UTF_8 ("Status: " & Get_Status_Message)));
             App.Status_Position_Text.Inner_HTML
-              (To_HTML (From_Latin_1 ("Position: " & Physical_Types.Position'Image (Get_Position))));
+              (To_HTML (From_UTF_8 ("Position: " & Physical_Types.Position'Image (Get_Position))));
          end select;
       end loop;
    end Status_Updater;
@@ -70,13 +70,13 @@ package body GUI.GUI is
          Command   : UXString := App.Manual_Gcode_Form_Entry.Value;
          Succeeded : Boolean;
       begin
-         Submit_Gcode (To_Latin_1 (Command), Succeeded);
+         Submit_Gcode (To_UTF_8 (Command), Succeeded);
          if Succeeded then
             App.Manual_Gcode_Log.Put_Line (To_HTML (Command));
             App.Manual_Gcode_Form_Entry.Value ("");
          else
             App.Manual_Gcode_Log.Put_Line
-              (From_Latin_1 ("Commands can not run while other commands or files are running."));
+              (From_UTF_8 ("Commands can not run while other commands or files are running."));
          end if;
       end On_Manual_Gcode_Submit;
    begin
@@ -132,7 +132,7 @@ package body GUI.GUI is
             for I in App.Config_Editor_Stepper_Widgets'Range loop
                App.Config_Editor_Stepper_Widgets (I).Create_Widget (App.Config_Editor_Steppers_Table.Cards, I);
                App.Config_Editor_Steppers_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Stepper_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Stepper_Widgets (I)'Access);
             end loop;
          end;
 
@@ -150,7 +150,7 @@ package body GUI.GUI is
                App.Config_Editor_Input_Switch_Widgets (I).Create_Widget
                  (App.Config_Editor_Input_Switches_Table.Cards, I);
                App.Config_Editor_Input_Switches_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Input_Switch_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Input_Switch_Widgets (I)'Access);
             end loop;
          end;
 
@@ -163,7 +163,7 @@ package body GUI.GUI is
             for I in App.Config_Editor_Homing_Widgets'Range loop
                App.Config_Editor_Homing_Widgets (I).Create_Widget (App.Config_Editor_Homing_Table.Cards, I);
                App.Config_Editor_Homing_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Homing_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Homing_Widgets (I)'Access);
             end loop;
          end;
 
@@ -180,7 +180,7 @@ package body GUI.GUI is
             for I in App.Config_Editor_Thermistor_Widgets'Range loop
                App.Config_Editor_Thermistor_Widgets (I).Create_Widget (App.Config_Editor_Thermistors_Table.Cards, I);
                App.Config_Editor_Thermistors_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Thermistor_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Thermistor_Widgets (I)'Access);
             end loop;
          end;
 
@@ -193,7 +193,7 @@ package body GUI.GUI is
             for I in App.Config_Editor_Heater_Widgets'Range loop
                App.Config_Editor_Heater_Widgets (I).Create_Widget (App.Config_Editor_Heaters_Table.Cards, I);
                App.Config_Editor_Heaters_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Heater_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Heater_Widgets (I)'Access);
             end loop;
          end;
 
@@ -210,7 +210,7 @@ package body GUI.GUI is
             for I in App.Config_Editor_Fan_Widgets'Range loop
                App.Config_Editor_Fan_Widgets (I).Create_Widget (App.Config_Editor_Fans_Table.Cards, I);
                App.Config_Editor_Fans_Table.Add_Tab
-                 (UXStrings.From_Latin_1 (I'Image), App.Config_Editor_Fan_Widgets (I)'Access);
+                 (UXStrings.From_UTF_8 (I'Image), App.Config_Editor_Fan_Widgets (I)'Access);
             end loop;
          end;
 
