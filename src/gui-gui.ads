@@ -15,7 +15,8 @@ generic
    with package My_Config is new Config.Config (<>);
    with function Get_Status_Message return String;
    with function Get_Position return Physical_Types.Position;
-   with procedure Submit_Gcode (Command : String; Succeeded : out Boolean);
+   with procedure Submit_Gcode_Command (Command : String; Succeeded : out Boolean);
+   with procedure Submit_Gcode_File (Path : String; Succeeded : out Boolean);
 package GUI.GUI is
 
    procedure Run;
@@ -77,6 +78,18 @@ private
       Manual_Gcode_Form               : aliased Gnoga.Gui.Element.Form.Form_Type;
       Manual_Gcode_Form_Entry         : aliased Gnoga.Gui.Element.Form.Text_Type;
       Manual_Gcode_Form_Submit_Button : aliased Gnoga.Gui.Element.Form.Submit_Button_Type;
+
+      Auto_Gcode_Table                      : aliased Gnoga.Gui.Element.Table.Table_Type;
+      Auto_Gcode_Log_Row                    : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Auto_Gcode_Log                        : aliased Gnoga.Gui.View.Console.Console_View_Type;
+      Auto_Gcode_Form_Row                   : aliased Gnoga.Gui.Element.Table.Table_Row_Type;
+      Auto_Gcode_Form_Div                   : aliased Gnoga.Gui.Element.Common.DIV_Type;
+      Auto_Gcode_File_Form                  : aliased Gnoga.Gui.Element.Form.Form_Type;
+      Auto_Gcode_File_Form_Entry            : aliased Gnoga.Gui.Element.Form.Selection_Type;
+      Auto_Gcode_File_Form_Submit_Button    : aliased Gnoga.Gui.Element.Form.Submit_Button_Type;
+      Auto_Gcode_Refresh_Form               : aliased Gnoga.Gui.Element.Form.Form_Type;
+      Auto_Gcode_Refresh_Form_Entry         : aliased Gnoga.Gui.Element.Form.Selection_Type;
+      Auto_Gcode_Refresh_Form_Submit_Button : aliased Gnoga.Gui.Element.Form.Submit_Button_Type;
    end record;
 
    type App_Access is access all App_Data;

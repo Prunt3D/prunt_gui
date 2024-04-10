@@ -2,6 +2,8 @@ with Ada.Unchecked_Deallocation;
 with Gnoga.Application.Multi_Connect;
 with Gnoga.Gui.View.Card;
 with Gnoga.Gui.Base;
+with Gnoga.Server;
+with Ada.Directories;
 
 package body GUI.GUI is
 
@@ -70,7 +72,7 @@ package body GUI.GUI is
          Command   : UXString := App.Manual_Gcode_Form_Entry.Value;
          Succeeded : Boolean;
       begin
-         Submit_Gcode (To_UTF_8 (Command), Succeeded);
+         Submit_Gcode_Command (To_UTF_8 (Command), Succeeded);
          if Succeeded then
             App.Manual_Gcode_Log.Put_Line (To_HTML (Command));
             App.Manual_Gcode_Form_Entry.Value ("");
@@ -79,6 +81,47 @@ package body GUI.GUI is
               (From_UTF_8 ("Commands can not run while other commands or files are running."));
          end if;
       end On_Manual_Gcode_Submit;
+
+      procedure On_Auto_Gcode_File_Submit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
+         Path      : UXString := App.Auto_Gcode_File_Form_Entry.Value;
+         Succeeded : Boolean;
+      begin
+         if Path /= "" then
+            Submit_Gcode_File
+              (To_UTF_8
+                 (Gnoga.Server.Application_Directory & Gnoga.Server.Directory_Separator & "upload" &
+                  Gnoga.Server.Directory_Separator & Path),
+               Succeeded);
+            if Succeeded then
+               App.Auto_Gcode_Log.Put_Line (To_HTML (Path));
+               App.Auto_Gcode_File_Form_Entry.Value ("");
+            else
+               App.Auto_Gcode_Log.Put_Line (From_UTF_8 ("Files can not run while other files are running."));
+            end if;
+         end if;
+      end On_Auto_Gcode_File_Submit;
+
+      procedure On_Auto_Gcode_Refresh_Submit (Object : in out Gnoga.Gui.Base.Base_Type'Class) is
+         use Ada.Directories;
+
+         procedure Fill_List (Directory_Entry : Directory_Entry_Type) is
+         begin
+            if Kind (Directory_Entry) = Ordinary_File then
+               App.Auto_Gcode_File_Form_Entry.Add_Option
+                 (From_UTF_8 (Simple_Name (Directory_Entry)), From_UTF_8 (Simple_Name (Directory_Entry)));
+            end if;
+         end Fill_List;
+      begin
+         App.Auto_Gcode_File_Form_Entry.Empty_Options;
+
+         Ada.Directories.Search
+           (Directory => To_UTF_8 (Gnoga.Server.Application_Directory & Gnoga.Server.Directory_Separator & "upload"),
+            Pattern   => "*.gcode",
+            Process   => Fill_List'Access);
+
+         App.Auto_Gcode_File_Form_Entry.Value ("");
+      end On_Auto_Gcode_Refresh_Submit;
+
    begin
       Main_Window.Connection_Data (Data => App, Dynamic => False);
 
@@ -220,7 +263,7 @@ package body GUI.GUI is
 
       end;
 
-      -- G-Code Console
+      --  G-Code Console
       begin
          App.Manual_Gcode_Table.Create (App.Main_Table.Cards);
 
@@ -236,6 +279,30 @@ package body GUI.GUI is
          App.Manual_Gcode_Form.On_Submit_Handler (On_Manual_Gcode_Submit'Unrestricted_Access);
 
          App.Main_Table.Add_Tab ("G-Code Console", App.Manual_Gcode_Table'Access);
+      end;
+
+      --  Run File
+      begin
+         App.Auto_Gcode_Table.Create (App.Main_Table.Cards);
+
+         App.Auto_Gcode_Log_Row.Create (App.Auto_Gcode_Table);
+         App.Auto_Gcode_Log.Create (App.Auto_Gcode_Log_Row);
+         App.Auto_Gcode_Log.Style ("height", "500px");
+
+         App.Auto_Gcode_Form_Row.Create (App.Auto_Gcode_Table);
+         App.Auto_Gcode_Form_Div.Create (App.Auto_Gcode_Form_Row);
+         App.Auto_Gcode_File_Form.Create (App.Auto_Gcode_Form_Div);
+         App.Auto_Gcode_File_Form_Entry.Create (App.Auto_Gcode_File_Form);
+         App.Auto_Gcode_File_Form_Submit_Button.Create (App.Auto_Gcode_File_Form, Value => "Run File");
+         App.Auto_Gcode_File_Form.On_Submit_Handler (On_Auto_Gcode_File_Submit'Unrestricted_Access);
+
+         App.Auto_Gcode_Refresh_Form.Create (App.Auto_Gcode_Form_Div);
+         App.Auto_Gcode_Refresh_Form_Submit_Button.Create (App.Auto_Gcode_Refresh_Form, Value => "Refresh");
+         App.Auto_Gcode_Refresh_Form.On_Submit_Handler (On_Auto_Gcode_Refresh_Submit'Unrestricted_Access);
+
+         On_Auto_Gcode_Refresh_Submit (App.Auto_Gcode_Refresh_Form);
+
+         App.Main_Table.Add_Tab ("Run File", App.Auto_Gcode_Table'Access);
       end;
 
       --  Log
