@@ -327,6 +327,7 @@ package body GUI.Config_Editor is
          Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Jerk (mm / s**3):"));
          Widget.Snap_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Snap (mm / s**4):"));
          Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Crackle (mm / s**5):"));
+         Widget.Pop_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Pop (mm / s**6) (unused):"));
          Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Deviation (mm):"));
       end Create;
 

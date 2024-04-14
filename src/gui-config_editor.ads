@@ -226,6 +226,7 @@ package GUI.Config_Editor is
          Jerk_Max         : Numeric_Row;
          Snap_Max         : Numeric_Row;
          Crackle_Max      : Numeric_Row;
+         Pop_Max          : Numeric_Row;
          Chord_Error_Max  : Numeric_Row;
       end record;
 
