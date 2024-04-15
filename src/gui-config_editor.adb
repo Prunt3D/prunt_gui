@@ -264,7 +264,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & " (mm):"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (Nice_Axis_Names (I) & " (mm):"));
          end loop;
       end Create;
 
@@ -294,7 +294,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & ":"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (Nice_Axis_Names (I) & ":"));
          end loop;
       end Create;
 
@@ -324,7 +324,7 @@ package body GUI.Config_Editor is
       begin
          Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
          for I in Widget.Rows'Range loop
-            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (I'Image & " (mm / s):"));
+            Widget.Rows (I).Create (Widget, Form, UXStrings.From_UTF_8 (Nice_Axis_Names (I) & " (mm / s):"));
          end loop;
       end Create;
 
@@ -475,28 +475,28 @@ package body GUI.Config_Editor is
          View.Invert_Direction_Input.Create (Form => View);
          View.Invert_Direction_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Invert_Direction:",
+            Name        => "Invert Direction:",
             Description => "If set, invert the direction signal output.",
             Data        => View.Invert_Direction_Input);
 
          View.Enabled_On_High_Input.Create (Form => View);
          View.Enabled_On_High_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Enabled_On_High:",
+            Name        => "Enabled On High:",
             Description => "If set, set the enable pin to high to enable the stepper.",
             Data        => View.Enabled_On_High_Input);
 
          View.Fault_On_High_Input.Create (Form => View);
          View.Fault_On_High_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Fault_On_High:",
+            Name        => "Fault On High:",
             Description => "If set, high reading on fault pin indicates that the stepper is in fault state.",
             Data        => View.Fault_On_High_Input);
 
          View.Mm_Per_Step_Input.Create (Form => View);
          View.Mm_Per_Step_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Mm_Per_Step (mm):",
+            Name        => "Mm Per Step (mm):",
             Description =>
               "The distance moved by the stepper for each transition of the step signal. " &
               "Note that this is the distance for each transition, not the distance for each complete cycle. " &
@@ -509,14 +509,14 @@ package body GUI.Config_Editor is
          View.Direction_Setup_Time_Input.Create (Form => View);
          View.Direction_Setup_Time_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Direction_Setup_Time (s):",
-            Description => "Time between any direction transition and any step transition on this stepper.",
+            Name        => "Direction Setup Time (s):",
+            Description => "Time between any direction transition and next step transition on this stepper.",
             Data        => View.Direction_Setup_Time_Input);
 
          View.Step_Time_Input.Create (Form => View);
          View.Step_Time_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Step_Time (s):",
+            Name        => "Step Time (s):",
             Description =>
               "Time between any step transitions on this stepper. " &
               "These limits will be enforced even if the commanded feedrate is faster, " &
@@ -571,7 +571,7 @@ package body GUI.Config_Editor is
          View.Lower_Pos_Limit_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Lower_Pos_Limit_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Lower_Pos_Limit:",
+            Name        => "Lower Position Limit:",
             Description =>
               "Minimum position that the printer may move to. The E axis may be set to " &
               Image (Physical_Types.Length'First / 2.0) & " for effectively infinite range.",
@@ -580,7 +580,7 @@ package body GUI.Config_Editor is
          View.Upper_Pos_Limit_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Upper_Pos_Limit_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Upper_Pos_Limit:",
+            Name        => "Upper Position Limit:",
             Description =>
               "Maximum position that the printer may move to. The E axis may be set to " &
               Image (Physical_Types.Length'Last / 2.0) & " for effectively infinite range.",
@@ -631,7 +631,7 @@ package body GUI.Config_Editor is
          View.Axial_Velocity_Maxes_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Axial_Velocity_Maxes_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Axial_Velocity_Maxes:",
+            Name        => "Axial Velocity Maxes:",
             Description =>
               "Maximum axial velocities. " &
               "Feedrates that result in axial velocities higher than these values will be clipped.",
@@ -640,10 +640,10 @@ package body GUI.Config_Editor is
          View.Ignore_E_In_XYZE_Input.Create (Form => View);
          View.Ignore_E_In_XYZE_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Ignore_E_In_XYZE:",
+            Name        => "Ignore E In XYZE:",
             Description =>
               "Ignore the E axis unless it is the only axis involved in a move. " &
-              "This behaviour in some other motion controllers.",
+              "This behaviour is the default in some other 3D printer motion controllers.",
             Data        => View.Ignore_E_In_XYZE_Input);
 
          View.Shift_Blended_Corners_Input.Create (Form => View);
@@ -672,26 +672,27 @@ package body GUI.Config_Editor is
          View.Higher_Order_Scaler_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Higher_Order_Scaler_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Higher_Order_Scaler:",
+            Name        => "Higher Order Scaler:",
             Description =>
               "Inside the motion planner, " &
               "all positions are multiples by this value before applying motion profile limits, " &
               "allowing for different limits on different axes. " &
               "You do not need to take this value in to account when setting position limits or mm per step values. " &
-              "Feedrates are computed based on the real positions, not the scaled positions.",
+              "Feedrates are limited based on the real positions, not the scaled positions." &
+              "Acceleration and above are limited based on scaled values.",
             Data        => View.Higher_Order_Scaler_Input);
 
          View.Z_Steppers_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Z_Steppers_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Z_Steppers:",
+            Name        => "Z Steppers:",
             Description => "Steppers attached to the Z axis.",
             Data        => View.Z_Steppers_Input);
 
          View.E_Steppers_Input.Create (Parent => View.Widget_Table, Form => View);
          View.E_Steppers_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "E_Steppers:",
+            Name        => "E Steppers:",
             Description => "Steppers attached to the E axis.",
             Data        => View.E_Steppers_Input);
 
@@ -706,32 +707,32 @@ package body GUI.Config_Editor is
          View.X_Steppers_Input.Create (Parent => View.Cartesian_Table, Form => View);
          View.X_Steppers_Row.Create
            (Parent      => View.Cartesian_Table,
-            Name        => "X_Steppers:",
+            Name        => "X Steppers:",
             Description => "Steppers attached to the X axis.",
             Data        => View.X_Steppers_Input);
 
          View.Y_Steppers_Input.Create (Parent => View.Cartesian_Table, Form => View);
          View.Y_Steppers_Row.Create
            (Parent      => View.Cartesian_Table,
-            Name        => "Y_Steppers:",
+            Name        => "Y Steppers:",
             Description => "Steppers attached to the Y axis.",
             Data        => View.Y_Steppers_Input);
 
          View.Core_XY_Table.Create (View.Kind_Table);
          View.Core_XY_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Core_XY", View.Core_XY_Table'Access);
+         View.Kind_Table.Add_Tab ("Core XY", View.Core_XY_Table'Access);
 
          View.A_Steppers_Input.Create (Parent => View.Core_XY_Table, Form => View);
          View.A_Steppers_Row.Create
            (Parent      => View.Core_XY_Table,
-            Name        => "A_Steppers:",
+            Name        => "A Steppers:",
             Description => "Steppers attached to the A axis. X axis = 0.5 * (A + B), Y axis = 0.5 * (A – B).",
             Data        => View.A_Steppers_Input);
 
          View.B_Steppers_Input.Create (Parent => View.Core_XY_Table, Form => View);
          View.B_Steppers_Row.Create
            (Parent      => View.Core_XY_Table,
-            Name        => "B_Steppers:",
+            Name        => "B Steppers:",
             Description => "Steppers attached to the B axis. X axis = 0.5 * (A + B), Y axis = 0.5 * (A – B).",
             Data        => View.B_Steppers_Input);
 
@@ -753,7 +754,7 @@ package body GUI.Config_Editor is
                View.X_Steppers_Input.Set (Params.X_Steppers);
                View.Y_Steppers_Input.Set (Params.Y_Steppers);
             when Core_XY_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Core_XY");
+               View.Kind_Table.Tabs.Select_Tab ("Core XY");
                View.A_Steppers_Input.Set (Params.A_Steppers);
                View.B_Steppers_Input.Set (Params.B_Steppers);
          end case;
@@ -832,7 +833,7 @@ package body GUI.Config_Editor is
          View.Hit_On_High_Input.Create (Form => View);
          View.Hit_On_High_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Hit_On_High:",
+            Name        => "Hit On High:",
             Description => "If set, the switch is considered to be hit when the related signal is high.",
             Data        => View.Hit_On_High_Input);
 
@@ -879,7 +880,7 @@ package body GUI.Config_Editor is
 
          View.Double_Tap_Table.Create (View.Kind_Table);
          View.Double_Tap_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Double_Tap", View.Double_Tap_Table'Access);
+         View.Kind_Table.Add_Tab ("Double Tap", View.Double_Tap_Table'Access);
 
          View.Switch_Input.Create (Form => View);
          View.Switch_Row.Create
@@ -891,7 +892,7 @@ package body GUI.Config_Editor is
          View.First_Move_Distance_Input.Create (Form => View);
          View.First_Move_Distance_Row.Create
            (Parent      => View.Double_Tap_Table,
-            Name        => "First_Move_Distance (mm):",
+            Name        => "First Move Distance (mm):",
             Description =>
               "The minimum length of the first move, may be negative to home towards negative infinity. " &
               "The axis will first move twice this far away from the homing direction iff the switch is hit. " &
@@ -903,7 +904,7 @@ package body GUI.Config_Editor is
          View.Second_Move_Distance_Input.Create (Form => View);
          View.Second_Move_Distance_Row.Create
            (Parent      => View.Double_Tap_Table,
-            Name        => "Second_Move_Distance (mm):",
+            Name        => "Second Move Distance (mm):",
             Description =>
               "The minimum length of the second move, may be negative to home towards negative infinity, " &
               "must be the same sign as the first distance. " & "The axis will move at least this far in total, " &
@@ -913,14 +914,16 @@ package body GUI.Config_Editor is
          View.Switch_Position_Input.Create (Form => View);
          View.Switch_Position_Row.Create
            (Parent      => View.Double_Tap_Table,
-            Name        => "Switch_Position (mm):",
+            Name        => "Switch Position (mm):",
             Description =>
-              "The position that the axis is considered to be at when the switch is hit during the second move.",
+              "The position that the axis is considered to be at when the switch is hit during the second move." &
+              "This position does not need to be inside the working area. " &
+              "If it is outside then the axis will move back in to the working area after homing.",
             Data        => View.Switch_Position_Input);
 
          View.Set_To_Value_Table.Create (View.Kind_Table);
          View.Set_To_Value_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Set_To_Value", View.Set_To_Value_Table'Access);
+         View.Kind_Table.Add_Tab ("Set To Value", View.Set_To_Value_Table'Access);
 
          View.Value_Input.Create (Form => View);
          View.Value_Row.Create
@@ -944,13 +947,13 @@ package body GUI.Config_Editor is
 
          case Params.Kind is
             when Double_Tap_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Double_Tap");
+               View.Kind_Table.Tabs.Select_Tab ("Double Tap");
                View.Switch_Input.Set (Params.Switch);
                View.First_Move_Distance_Input.Set (Params.First_Move_Distance);
                View.Second_Move_Distance_Input.Set (Params.Second_Move_Distance);
                View.Switch_Position_Input.Set (Params.Switch_Position);
             when Set_To_Value_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Set_To_Value");
+               View.Kind_Table.Tabs.Select_Tab ("Set To Value");
                View.Value_Input.Set (Params.Value);
          end case;
       end Read_Data;
@@ -985,27 +988,16 @@ package body GUI.Config_Editor is
          View.Nozzle_Diameter_Input.Create (Form => View);
          View.Nozzle_Diameter_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Nozzle_Diameter (mm):",
+            Name        => "Nozzle Diameter (mm):",
             Description => "The diameter of the nozzle.",
             Data        => View.Nozzle_Diameter_Input);
 
          View.Filament_Diameter_Input.Create (Form => View);
          View.Filament_Diameter_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Filament_Diameter (mm):",
+            Name        => "Filament Diameter (mm):",
             Description => "The diameter of the filament.",
             Data        => View.Filament_Diameter_Input);
-
-         View.Starting_Pressure_Advance_Time_Input.Create (Form => View);
-         View.Starting_Pressure_Advance_Time_Row.Create
-           (Parent      => View.Widget_Table,
-            Name        => "Starting_Pressure_Advance_Time (s):",
-            Description =>
-              "The initial pressure advance time before a value is set by g-code. " &
-              "There is no equivalent of smoothing time as used by other motion controllers as the use of " &
-              "crackle-limited motion planning prevents the discontinuity in velocity " &
-              "that would otherwise be present. There is instead a discontinuity in snap.",
-            Data        => View.Starting_Pressure_Advance_Time_Input);
 
          View.Read_Data;
 
@@ -1021,15 +1013,13 @@ package body GUI.Config_Editor is
 
          View.Nozzle_Diameter_Input.Set (Params.Nozzle_Diameter);
          View.Filament_Diameter_Input.Set (Params.Filament_Diameter);
-         View.Starting_Pressure_Advance_Time_Input.Set (Params.Starting_Pressure_Advance_Time);
       end Read_Data;
 
       overriding procedure Save_Data (View : in out Extruder_Widget; Image : out UXString) is
          Params : Extruder_Parameters;
       begin
-         Params.Nozzle_Diameter                := View.Nozzle_Diameter_Input.Get;
-         Params.Filament_Diameter              := View.Filament_Diameter_Input.Get;
-         Params.Starting_Pressure_Advance_Time := View.Starting_Pressure_Advance_Time_Input.Get;
+         Params.Nozzle_Diameter   := View.Nozzle_Diameter_Input.Get;
+         Params.Filament_Diameter := View.Filament_Diameter_Input.Get;
 
          My_Config.Config_File.Write (Params);
 
@@ -1056,14 +1046,14 @@ package body GUI.Config_Editor is
          View.Minimum_Temperature_Input.Create (Form => View);
          View.Minimum_Temperature_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => UXStrings.From_UTF_8 ("Minimum_Temperature (°C):"),
+            Name        => UXStrings.From_UTF_8 ("Minimum Temperature (°C):"),
             Description => "Any temperature below this value indicates a failure.",
             Data        => View.Minimum_Temperature_Input);
 
          View.Maximum_Temperature_Input.Create (Form => View);
          View.Maximum_Temperature_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => UXStrings.From_UTF_8 ("Maximum_Temperature (°C):"),
+            Name        => UXStrings.From_UTF_8 ("Maximum Temperature (°C):"),
             Description => "Any temperature above this value indicates a failure.",
             Data        => View.Maximum_Temperature_Input);
 
@@ -1128,32 +1118,32 @@ package body GUI.Config_Editor is
          View.Proportional_Scale_Input.Create (Form => View);
          View.Proportional_Scale_Row.Create
            (Parent      => View.PID_Table,
-            Name        => "Proportional_Scale:",
+            Name        => "Proportional Scale:",
             Description => "Coefficient for the proportional term.",
             Data        => View.Proportional_Scale_Input);
 
          View.Integral_Scale_Input.Create (Form => View);
          View.Integral_Scale_Row.Create
            (Parent      => View.PID_Table,
-            Name        => "Integral_Scale:",
+            Name        => "Integral Scale:",
             Description => "Coefficient for the integral term.",
             Data        => View.Integral_Scale_Input);
 
          View.Derivative_Scale_Input.Create (Form => View);
          View.Derivative_Scale_Row.Create
            (Parent      => View.PID_Table,
-            Name        => "Derivative_Scale:",
+            Name        => "Derivative Scale:",
             Description => "Coefficient for the derivative term.",
             Data        => View.Derivative_Scale_Input);
 
          View.Bang_Bang_Table.Create (View.Kind_Table);
          View.Bang_Bang_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Bang_Bang", View.Bang_Bang_Table'Access);
+         View.Kind_Table.Add_Tab ("Bang Bang", View.Bang_Bang_Table'Access);
 
          View.Max_Delta_Input.Create (Form => View);
          View.Max_Delta_Row.Create
            (Parent      => View.Bang_Bang_Table,
-            Name        => UXStrings.From_UTF_8 ("Max_Delta (°C):"),
+            Name        => UXStrings.From_UTF_8 ("Max Delta (°C):"),
             Description =>
               "Maximum temperature below or above the target temperature where " &
               "the heater will be switched on or off respectively.",
@@ -1180,7 +1170,7 @@ package body GUI.Config_Editor is
                View.Integral_Scale_Input.Set (Params.Integral_Scale);
                View.Derivative_Scale_Input.Set (Params.Derivative_Scale);
             when Bang_Bang_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Bang_Bang");
+               View.Kind_Table.Tabs.Select_Tab ("Bang Bang");
                View.Max_Delta_Input.Set (Params.Max_Delta);
          end case;
          View.Thermistor_Input.Set (Params.Thermistor);
@@ -1222,7 +1212,7 @@ package body GUI.Config_Editor is
 
          View.No_Mesh_Table.Create (View.Kind_Table);
          View.No_Mesh_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("No_Mesh", View.No_Mesh_Table'Access);
+         View.Kind_Table.Add_Tab ("No Mesh", View.No_Mesh_Table'Access);
 
          View.Beacon_Table.Create (View.Kind_Table);
          View.Beacon_Table.Style ("border-collapse", "collapse");
@@ -1231,42 +1221,42 @@ package body GUI.Config_Editor is
          View.Serial_Port_Path_Input.Create (Form => View);
          View.Serial_Port_Path_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Serial_Port_Path:",
+            Name        => "Serial Port Path:",
             Description => "Path to the Beacon serial port.",
             Data        => View.Serial_Port_Path_Input);
 
          View.X_Offset_Input.Create (Form => View);
          View.X_Offset_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "X_Offset (mm):",
+            Name        => "X Offset (mm):",
             Description => "Offset along the X axis of the probe to the nozzle.",
             Data        => View.X_Offset_Input);
 
          View.Y_Offset_Input.Create (Form => View);
          View.Y_Offset_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Y_Offset (mm):",
+            Name        => "Y Offset (mm):",
             Description => "Offset along the Y axis of the probe to the nozzle.",
             Data        => View.Y_Offset_Input);
 
          View.Calibration_Floor_Input.Create (Form => View);
          View.Calibration_Floor_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Calibration_Floor (mm):",
+            Name        => "Calibration Floor (mm):",
             Description => "Z axis value to use for lowest calibration point.",
             Data        => View.Calibration_Floor_Input);
 
          View.Calibration_Ceiling_Input.Create (Form => View);
          View.Calibration_Ceiling_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Calibration_Ceiling (mm):",
+            Name        => "Calibration Ceiling (mm):",
             Description => "Z axis value to use for highest calibration point.",
             Data        => View.Calibration_Ceiling_Input);
 
          View.Calibration_Feedrate_Input.Create (Form => View);
          View.Calibration_Feedrate_Row.Create
            (Parent      => View.Beacon_Table,
-            Name        => "Calibration_Feedrate (mm / s):",
+            Name        => "Calibration Feedrate (mm / s):",
             Description => "Feedrate used for calibration sequence.",
             Data        => View.Calibration_Feedrate_Input);
 
@@ -1284,7 +1274,7 @@ package body GUI.Config_Editor is
 
          case Params.Kind is
             when No_Mesh_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("No_Mesh");
+               View.Kind_Table.Tabs.Select_Tab ("No Mesh");
             when Beacon_Kind =>
                View.Kind_Table.Tabs.Select_Tab ("Beacon");
                View.Serial_Port_Path_Input.Set (Params.Serial_Port_Path);
@@ -1310,7 +1300,7 @@ package body GUI.Config_Editor is
             Params.Calibration_Ceiling  := View.Calibration_Ceiling_Input.Get;
             Params.Calibration_Feedrate := View.Calibration_Feedrate_Input.Get;
          else
-            raise Constraint_Error with "Bed_Mesh type must be selected.";
+            raise Constraint_Error with "Bed Mesh type must be selected.";
          end if;
 
          My_Config.Config_File.Write (Params);
@@ -1338,19 +1328,19 @@ package body GUI.Config_Editor is
 
          View.Dynamic_PWM_Table.Create (View.Kind_Table);
          View.Dynamic_PWM_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Dynamic_PWM", View.Dynamic_PWM_Table'Access);
+         View.Kind_Table.Add_Tab ("Dynamic PWM", View.Dynamic_PWM_Table'Access);
 
          View.Disable_Below_PWM_Input.Create (Form => View);
          View.Disable_Below_PWM_Row.Create
            (Parent      => View.Dynamic_PWM_Table,
-            Name        => "Disable_Below_PWM:",
+            Name        => "Disable Below PWM:",
             Description => "Any set PWM ratio below this value will shut off power to the fan.",
             Data        => View.Disable_Below_PWM_Input);
 
          View.Max_PWM_Input.Create (Form => View);
          View.Max_PWM_Row.Create
            (Parent      => View.Dynamic_PWM_Table,
-            Name        => "Max_PWM:",
+            Name        => "Max PWM:",
             Description =>
               "The maximum PWM ratio of the fan, corresponding to 100% power setting in g-code or the UI.",
             Data        => View.Max_PWM_Input);
@@ -1358,44 +1348,44 @@ package body GUI.Config_Editor is
          View.Fixed_Voltage_Input.Create (Form => View);
          View.Fixed_Voltage_Row.Create
            (Parent      => View.Dynamic_PWM_Table,
-            Name        => "Fixed_Voltage (V):",
+            Name        => "Fixed Voltage (V):",
             Description => "The constant voltage to output.",
             Data        => View.Fixed_Voltage_Input);
 
          View.Dynamic_Voltage_Table.Create (View.Kind_Table);
          View.Dynamic_Voltage_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Dynamic_Voltage", View.Dynamic_Voltage_Table'Access);
+         View.Kind_Table.Add_Tab ("Dynamic Voltage", View.Dynamic_Voltage_Table'Access);
 
          View.Disable_Below_Voltage_Input.Create (Form => View);
          View.Disable_Below_Voltage_Row.Create
            (Parent      => View.Dynamic_Voltage_Table,
-            Name        => "Disable_Below_Voltage (V):",
+            Name        => "Disable Below Voltage (V):",
             Description => "Any set voltage below this voltage will shut off power to the fan.",
             Data        => View.Disable_Below_Voltage_Input);
 
          View.Max_Voltage_Input.Create (Form => View);
          View.Max_Voltage_Row.Create
            (Parent      => View.Dynamic_Voltage_Table,
-            Name        => "Max_Voltage (V):",
+            Name        => "Max Voltage (V):",
             Description =>
               "The full scale voltage of the fan, corresponding to 100% power setting in g-code or the UI.",
             Data        => View.Max_Voltage_Input);
 
          View.Always_On_Table.Create (View.Kind_Table);
          View.Always_On_Table.Style ("border-collapse", "collapse");
-         View.Kind_Table.Add_Tab ("Always_On", View.Always_On_Table'Access);
+         View.Kind_Table.Add_Tab ("Always On", View.Always_On_Table'Access);
 
          View.Always_On_PWM_Input.Create (Form => View);
          View.Always_On_PWM_Row.Create
            (Parent      => View.Always_On_Table,
-            Name        => "Always_On_PWM:",
+            Name        => "Always On PWM:",
             Description => "The constant PWM ratio to output.",
             Data        => View.Always_On_PWM_Input);
 
          View.Always_On_Voltage_Input.Create (Form => View);
          View.Always_On_Voltage_Row.Create
            (Parent      => View.Always_On_Table,
-            Name        => "Always_On_Voltage (V):",
+            Name        => "Always On Voltage (V):",
             Description => "The constant voltage to output.",
             Data        => View.Always_On_Voltage_Input);
 
@@ -1415,16 +1405,16 @@ package body GUI.Config_Editor is
             when Disabled_Kind =>
                View.Kind_Table.Tabs.Select_Tab ("Disabled");
             when Dynamic_PWM_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Dynamic_PWM");
+               View.Kind_Table.Tabs.Select_Tab ("Dynamic PWM");
                View.Disable_Below_PWM_Input.Set (Params.Disable_Below_PWM);
                View.Max_PWM_Input.Set (Params.Max_PWM);
                View.Fixed_Voltage_Input.Set (Params.Fixed_Voltage);
             when Dynamic_Voltage_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Dynamic_Voltage");
+               View.Kind_Table.Tabs.Select_Tab ("Dynamic Voltage");
                View.Disable_Below_Voltage_Input.Set (Params.Disable_Below_Voltage);
                View.Max_Voltage_Input.Set (Params.Max_Voltage);
             when Always_On_Kind =>
-               View.Kind_Table.Tabs.Select_Tab ("Always_On");
+               View.Kind_Table.Tabs.Select_Tab ("Always On");
                View.Always_On_PWM_Input.Set (Params.Always_On_PWM);
                View.Always_On_Voltage_Input.Set (Params.Always_On_Voltage);
          end case;
@@ -1467,7 +1457,7 @@ package body GUI.Config_Editor is
          View.Bed_Heater_Input.Create (Form => View);
          View.Bed_Heater_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Bed_Heater:",
+            Name        => "Bed Heater:",
             Description => "The heater assigned to the bed in g-code.",
             Data        => View.Bed_Heater_Input);
 
@@ -1481,7 +1471,7 @@ package body GUI.Config_Editor is
          View.Hotend_Heater_Input.Create (Form => View);
          View.Hotend_Heater_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Hotend_Heater:",
+            Name        => "Hotend Heater:",
             Description => "The heater assigned to the hotend in g-code.",
             Data        => View.Hotend_Heater_Input);
 

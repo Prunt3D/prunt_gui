@@ -19,5 +19,15 @@
 --                                                                         --
 -----------------------------------------------------------------------------
 
+private with Physical_Types;
+
 package GUI is
+
+private
+
+   use Physical_Types;
+
+   Nice_Axis_Names : constant array (Axis_Name) of String (1..6) :=
+     [X_Axis => "X Axis", Y_Axis => "Y Axis", Z_Axis => "Z Axis", E_Axis => "E Axis"];
+
 end GUI;
