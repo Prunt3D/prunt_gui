@@ -49,10 +49,6 @@ package GUI.Config_Editor is
       function Get (Input : Time_Input) return Time;
       procedure Set (Input : in out Time_Input; Value : Time);
 
-      type Cruise_Ratio_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
-      function Get (Input : Cruise_Ratio_Input) return Cruise_Ratio;
-      procedure Set (Input : in out Cruise_Ratio_Input; Value : Cruise_Ratio);
-
       type Temperature_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
       function Get (Input : Temperature_Input) return Temperature;
       procedure Set (Input : in out Temperature_Input; Value : Temperature);
@@ -72,6 +68,22 @@ package GUI.Config_Editor is
       type Velocity_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
       function Get (Input : Velocity_Input) return Velocity;
       procedure Set (Input : in out Velocity_Input; Value : Velocity);
+
+      type Acceleration_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Acceleration_Input) return Acceleration;
+      procedure Set (Input : in out Acceleration_Input; Value : Acceleration);
+
+      type Jerk_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Jerk_Input) return Jerk;
+      procedure Set (Input : in out Jerk_Input; Value : Jerk);
+
+      type Snap_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Snap_Input) return Snap;
+      procedure Set (Input : in out Snap_Input; Value : Snap);
+
+      type Crackle_Input is new Gnoga.Gui.Element.Form.Number_Type with null record;
+      function Get (Input : Crackle_Input) return Crackle;
+      procedure Set (Input : in out Crackle_Input; Value : Crackle);
 
       type Path_String_Input is new Gnoga.Gui.Element.Form.Text_Type with null record;
       function Get (Input : Path_String_Input) return Path_Strings.Bounded_String;
@@ -154,17 +166,6 @@ package GUI.Config_Editor is
       function Get (Widget : Axial_Velocities_Widget) return Physical_Types.Axial_Velocities;
       procedure Set (Widget : in out Axial_Velocities_Widget; Vels : Physical_Types.Axial_Velocities);
 
-      type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
-
-      procedure Create
-        (Widget : in out Kinematic_Limits_Widget;
-         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
-         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
-         ID     :        UXString := "");
-
-      function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits;
-      procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits);
-
       type Attached_Steppers_Widget is new Gnoga.Gui.Element.Table.Table_Type with private;
 
       procedure Create
@@ -219,15 +220,6 @@ package GUI.Config_Editor is
       type Axial_Velocities_Rows is array (Axis_Name) of Numeric_Row;
       type Axial_Velocities_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
          Rows : Axial_Velocities_Rows;
-      end record;
-
-      type Kinematic_Limits_Widget is new Gnoga.Gui.Element.Table.Table_Type with record
-         Acceleration_Max : Numeric_Row;
-         Jerk_Max         : Numeric_Row;
-         Snap_Max         : Numeric_Row;
-         Crackle_Max      : Numeric_Row;
-         Pop_Max          : Numeric_Row;
-         Chord_Error_Max  : Numeric_Row;
       end record;
 
       type Stepper_Rows is array (Stepper_Name) of Check_Box_Row;
@@ -340,27 +332,39 @@ package GUI.Config_Editor is
       end record;
 
       type Kinematics_Widget is new Parent_Type with record
-         Widget_Table                          : Gnoga.Gui.Element.Table.Table_Type;
-         Lower_Pos_Limit_Row                   : Parameter_Rows.Parameter_Row;
-         Lower_Pos_Limit_Input                 : Grouped_Element_Widgets.Position_Widget;
-         Upper_Pos_Limit_Row                   : Parameter_Rows.Parameter_Row;
-         Upper_Pos_Limit_Input                 : Grouped_Element_Widgets.Position_Widget;
-         Max_Limits_Row                        : Parameter_Rows.Parameter_Row;
-         Max_Limits_Input                      : Grouped_Element_Widgets.Kinematic_Limits_Widget;
-         Max_Feedrate_Row                      : Parameter_Rows.Parameter_Row;
-         Max_Feedrate_Input                    : Basic_Inputs.Velocity_Input;
-         Max_Axial_Velocities_Row              : Parameter_Rows.Parameter_Row;
-         Max_Axial_Velocities_Input            : Grouped_Element_Widgets.Axial_Velocities_Widget;
-         Ignore_E_Feedrate_In_XYZE_Moves_Row   : Parameter_Rows.Parameter_Row;
-         Ignore_E_Feedrate_In_XYZE_Moves_Input : Basic_Inputs.Boolean_Input;
-         Planning_Scaler_Row                   : Parameter_Rows.Parameter_Row;
-         Planning_Scaler_Input                 : Grouped_Element_Widgets.Position_Scale_Widget;
-         Minimum_Cruise_Ratio_Row              : Parameter_Rows.Parameter_Row;
-         Minimum_Cruise_Ratio_Input            : Basic_Inputs.Cruise_Ratio_Input;
-         Z_Steppers_Row                        : Parameter_Rows.Parameter_Row;
-         Z_Steppers_Input                      : Grouped_Element_Widgets.Attached_Steppers_Widget;
-         E_Steppers_Row                        : Parameter_Rows.Parameter_Row;
-         E_Steppers_Input                      : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         Widget_Table                  : Gnoga.Gui.Element.Table.Table_Type;
+         Lower_Pos_Limit_Row           : Parameter_Rows.Parameter_Row;
+         Lower_Pos_Limit_Input         : Grouped_Element_Widgets.Position_Widget;
+         Upper_Pos_Limit_Row           : Parameter_Rows.Parameter_Row;
+         Upper_Pos_Limit_Input         : Grouped_Element_Widgets.Position_Widget;
+         Tangential_Velocity_Max_Row   : Parameter_Rows.Parameter_Row;
+         Tangential_Velocity_Max_Input : Basic_Inputs.Velocity_Input;
+         Acceleration_Max_Row          : Parameter_Rows.Parameter_Row;
+         Acceleration_Max_Input        : Basic_Inputs.Acceleration_Input;
+         Jerk_Max_Row                  : Parameter_Rows.Parameter_Row;
+         Jerk_Max_Input                : Basic_Inputs.Jerk_Input;
+         Snap_Max_Row                  : Parameter_Rows.Parameter_Row;
+         Snap_Max_Input                : Basic_Inputs.Snap_Input;
+         Crackle_Max_Row               : Parameter_Rows.Parameter_Row;
+         Crackle_Max_Input             : Basic_Inputs.Crackle_Input;
+         Pop_Max_Row                   : Parameter_Rows.Parameter_Row;
+         Pop_Max_Input                 : Basic_Inputs.Crackle_Input;
+         Axial_Velocity_Maxes_Row      : Parameter_Rows.Parameter_Row;
+         Axial_Velocity_Maxes_Input    : Grouped_Element_Widgets.Axial_Velocities_Widget;
+         Ignore_E_In_XYZE_Row          : Parameter_Rows.Parameter_Row;
+         Ignore_E_In_XYZE_Input        : Basic_Inputs.Boolean_Input;
+         Shift_Blended_Corners_Row     : Parameter_Rows.Parameter_Row;
+         Shift_Blended_Corners_Input   : Basic_Inputs.Boolean_Input;
+         Pressure_Advance_Time_Row     : Parameter_Rows.Parameter_Row;
+         Pressure_Advance_Time_Input   : Basic_Inputs.Time_Input;
+         Chord_Error_Max_Row           : Parameter_Rows.Parameter_Row;
+         Chord_Error_Max_Input         : Basic_Inputs.Length_Input;
+         Higher_Order_Scaler_Row       : Parameter_Rows.Parameter_Row;
+         Higher_Order_Scaler_Input     : Grouped_Element_Widgets.Position_Scale_Widget;
+         Z_Steppers_Row                : Parameter_Rows.Parameter_Row;
+         Z_Steppers_Input              : Grouped_Element_Widgets.Attached_Steppers_Widget;
+         E_Steppers_Row                : Parameter_Rows.Parameter_Row;
+         E_Steppers_Input              : Grouped_Element_Widgets.Attached_Steppers_Widget;
 
          Kind_Table : Cards_Table_Type;
 

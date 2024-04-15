@@ -73,16 +73,6 @@ package body GUI.Config_Editor is
          Input.Value (Image (Value / s));
       end Set;
 
-      function Get (Input : Cruise_Ratio_Input) return Cruise_Ratio is
-      begin
-         return Cruise_Ratio'Value (Input.Value.To_UTF_8);
-      end Get;
-
-      procedure Set (Input : in out Cruise_Ratio_Input; Value : Cruise_Ratio) is
-      begin
-         Input.Value (Image (Value));
-      end Set;
-
       function Get (Input : Temperature_Input) return Temperature is
       begin
          return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * celcius;
@@ -131,6 +121,46 @@ package body GUI.Config_Editor is
       procedure Set (Input : in out Velocity_Input; Value : Velocity) is
       begin
          Input.Value (Image (Value / (mm / s)));
+      end Set;
+
+      function Get (Input : Acceleration_Input) return Acceleration is
+      begin
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm / s**2;
+      end Get;
+
+      procedure Set (Input : in out Acceleration_Input; Value : Acceleration) is
+      begin
+         Input.Value (Image (Value / (mm / s**2)));
+      end Set;
+
+      function Get (Input : Jerk_Input) return Jerk is
+      begin
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm / s**3;
+      end Get;
+
+      procedure Set (Input : in out Jerk_Input; Value : Jerk) is
+      begin
+         Input.Value (Image (Value / (mm / s**3)));
+      end Set;
+
+      function Get (Input : Snap_Input) return Snap is
+      begin
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm / s**4;
+      end Get;
+
+      procedure Set (Input : in out Snap_Input; Value : Snap) is
+      begin
+         Input.Value (Image (Value / (mm / s**4)));
+      end Set;
+
+      function Get (Input : Crackle_Input) return Crackle is
+      begin
+         return Physical_Types.Dimensionless'Value (Input.Value.To_UTF_8) * mm / s**5;
+      end Get;
+
+      procedure Set (Input : in out Crackle_Input; Value : Crackle) is
+      begin
+         Input.Value (Image (Value / (mm / s**5)));
       end Set;
 
       function Get (Input : Path_String_Input) return Path_Strings.Bounded_String is
@@ -313,41 +343,6 @@ package body GUI.Config_Editor is
          for I in Vels'Range loop
             Widget.Rows (I).Input.Value (Image (Vels (I) / (mm / s)));
          end loop;
-      end Set;
-
-      procedure Create
-        (Widget : in out Kinematic_Limits_Widget;
-         Parent : in out Gnoga.Gui.Element.Element_Type'Class;
-         Form   : in out Gnoga.Gui.Element.Form.Form_Type'Class;
-         ID     :        UXString := "")
-      is
-      begin
-         Gnoga.Gui.Element.Table.Table_Type (Widget).Create (Parent, ID);
-         Widget.Acceleration_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Acceleration (mm / s**2):"));
-         Widget.Jerk_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Jerk (mm / s**3):"));
-         Widget.Snap_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Snap (mm / s**4):"));
-         Widget.Crackle_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Crackle (mm / s**5):"));
-         Widget.Pop_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Pop (mm / s**6) (unused):"));
-         Widget.Chord_Error_Max.Create (Widget, Form, UXStrings.From_UTF_8 ("Deviation (mm):"));
-      end Create;
-
-      function Get (Widget : Kinematic_Limits_Widget) return Motion_Planner.Kinematic_Limits is
-      begin
-         return
-           (Acceleration_Max => Dimensionless'Value (Widget.Acceleration_Max.Input.Value.To_UTF_8) * mm / s**2,
-            Jerk_Max         => Dimensionless'Value (Widget.Jerk_Max.Input.Value.To_UTF_8) * mm / s**3,
-            Snap_Max         => Dimensionless'Value (Widget.Snap_Max.Input.Value.To_UTF_8) * mm / s**4,
-            Crackle_Max      => Dimensionless'Value (Widget.Crackle_Max.Input.Value.To_UTF_8) * mm / s**5,
-            Chord_Error_Max  => Dimensionless'Value (Widget.Chord_Error_Max.Input.Value.To_UTF_8) * mm);
-      end Get;
-
-      procedure Set (Widget : in out Kinematic_Limits_Widget; Limits : Motion_Planner.Kinematic_Limits) is
-      begin
-         Widget.Acceleration_Max.Input.Value (Image (Limits.Acceleration_Max / (mm / s**2)));
-         Widget.Jerk_Max.Input.Value (Image (Limits.Jerk_Max / (mm / s**3)));
-         Widget.Snap_Max.Input.Value (Image (Limits.Snap_Max / (mm / s**4)));
-         Widget.Crackle_Max.Input.Value (Image (Limits.Crackle_Max / (mm / s**5)));
-         Widget.Chord_Error_Max.Input.Value (Image (Limits.Chord_Error_Max / mm));
       end Set;
 
       procedure Create
@@ -591,56 +586,100 @@ package body GUI.Config_Editor is
               Image (Physical_Types.Length'Last / 2.0) & " for effectively infinite range.",
             Data        => View.Upper_Pos_Limit_Input);
 
-         View.Max_Limits_Input.Create (Parent => View.Widget_Table, Form => View);
-         View.Max_Limits_Row.Create
+         View.Tangential_Velocity_Max_Input.Create (Form => View);
+         View.Tangential_Velocity_Max_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Max_Limits:",
-            Description => "Maximum motion profile limits.",
-            Data        => View.Max_Limits_Input);
-
-         View.Max_Feedrate_Input.Create (Form => View);
-         View.Max_Feedrate_Row.Create
-           (Parent      => View.Widget_Table,
-            Name        => "Max_Feedrate:",
+            Name        => "Max Feedrate (mm / s):",
             Description => "Maximum tangential feedrate. Feedrates higher than this value will be clipped.",
-            Data        => View.Max_Feedrate_Input);
+            Data        => View.Tangential_Velocity_Max_Input);
 
-         View.Max_Axial_Velocities_Input.Create (Parent => View.Widget_Table, Form => View);
-         View.Max_Axial_Velocities_Row.Create
+         View.Acceleration_Max_Input.Create (Form => View);
+         View.Acceleration_Max_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Max_Axial_Velocities:",
+            Name        => "Max Acceleration (mm / s**2):",
+            Description => "",
+            Data        => View.Acceleration_Max_Input);
+
+         View.Jerk_Max_Input.Create (Form => View);
+         View.Jerk_Max_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max Jerk (mm / s**3):",
+            Description => "",
+            Data        => View.Jerk_Max_Input);
+
+         View.Snap_Max_Input.Create (Form => View);
+         View.Snap_Max_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max Snap (mm / s**4):",
+            Description => "",
+            Data        => View.Snap_Max_Input);
+
+         View.Crackle_Max_Input.Create (Form => View);
+         View.Crackle_Max_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max Crackle (mm / s**5):",
+            Description => "",
+            Data        => View.Crackle_Max_Input);
+
+         View.Pop_Max_Input.Create (Form => View);
+         View.Pop_Max_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max Pop:",
+            Description => "Does nothing aside from completing the set.",
+            Data        => View.Pop_Max_Input);
+
+         View.Axial_Velocity_Maxes_Input.Create (Parent => View.Widget_Table, Form => View);
+         View.Axial_Velocity_Maxes_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Axial_Velocity_Maxes:",
             Description =>
               "Maximum axial velocities. " &
               "Feedrates that result in axial velocities higher than these values will be clipped.",
-            Data        => View.Max_Axial_Velocities_Input);
+            Data        => View.Axial_Velocity_Maxes_Input);
 
-         View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Create (Form => View);
-         View.Ignore_E_Feedrate_In_XYZE_Moves_Row.Create
+         View.Ignore_E_In_XYZE_Input.Create (Form => View);
+         View.Ignore_E_In_XYZE_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Ignore_E_Feedrate_In_XYZE_Moves:",
+            Name        => "Ignore_E_In_XYZE:",
             Description =>
               "Ignore the E axis unless it is the only axis involved in a move. " &
               "This behaviour in some other motion controllers.",
-            Data        => View.Ignore_E_Feedrate_In_XYZE_Moves_Input);
+            Data        => View.Ignore_E_In_XYZE_Input);
 
-         View.Planning_Scaler_Input.Create (Parent => View.Widget_Table, Form => View);
-         View.Planning_Scaler_Row.Create
+         View.Shift_Blended_Corners_Input.Create (Form => View);
+         View.Shift_Blended_Corners_Row.Create
            (Parent      => View.Widget_Table,
-            Name        => "Planning_Scaler:",
+            Name        => "Shift Blended Corners:",
+            Description =>
+              "When blending corners, shift the virtual corners so that the curve intersects the original corner. " &
+              "Corners that are too close to the edges of the work area will never be shifted.",
+            Data        => View.Shift_Blended_Corners_Input);
+
+         View.Pressure_Advance_Time_Input.Create (Form => View);
+         View.Pressure_Advance_Time_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Pressure Advance Time (s):",
+            Description => "The E axis velocity is multiplied by this value added to the E axis position.",
+            Data        => View.Pressure_Advance_Time_Input);
+
+         View.Chord_Error_Max_Input.Create (Form => View);
+         View.Chord_Error_Max_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Max Chord Error (mm):",
+            Description => "Maximum distance that the path may deviate from the commanded path.",
+            Data        => View.Chord_Error_Max_Input);
+
+         View.Higher_Order_Scaler_Input.Create (Parent => View.Widget_Table, Form => View);
+         View.Higher_Order_Scaler_Row.Create
+           (Parent      => View.Widget_Table,
+            Name        => "Higher_Order_Scaler:",
             Description =>
               "Inside the motion planner, " &
               "all positions are multiples by this value before applying motion profile limits, " &
               "allowing for different limits on different axes. " &
               "You do not need to take this value in to account when setting position limits or mm per step values. " &
               "Feedrates are computed based on the real positions, not the scaled positions.",
-            Data        => View.Planning_Scaler_Input);
-
-         View.Minimum_Cruise_Ratio_Input.Create (Form => View);
-         View.Minimum_Cruise_Ratio_Row.Create
-           (Parent      => View.Widget_Table,
-            Name        => "Minimum_Cruise_Ratio:",
-            Description => "Minimum ratio of time in a move that must be spent at zero acceleration.",
-            Data        => View.Minimum_Cruise_Ratio_Input);
+            Data        => View.Higher_Order_Scaler_Input);
 
          View.Z_Steppers_Input.Create (Parent => View.Widget_Table, Form => View);
          View.Z_Steppers_Row.Create
@@ -718,14 +757,19 @@ package body GUI.Config_Editor is
                View.A_Steppers_Input.Set (Params.A_Steppers);
                View.B_Steppers_Input.Set (Params.B_Steppers);
          end case;
-         View.Lower_Pos_Limit_Input.Set (Params.Lower_Pos_Limit);
-         View.Upper_Pos_Limit_Input.Set (Params.Upper_Pos_Limit);
-         View.Max_Limits_Input.Set (Params.Max_Limits);
-         View.Max_Feedrate_Input.Set (Params.Max_Feedrate);
-         View.Max_Axial_Velocities_Input.Set (Params.Max_Axial_Velocities);
-         View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Set (Params.Ignore_E_Feedrate_In_XYZE_Moves);
-         View.Planning_Scaler_Input.Set (Params.Planning_Scaler);
-         View.Minimum_Cruise_Ratio_Input.Set (Params.Minimum_Cruise_Ratio);
+         View.Lower_Pos_Limit_Input.Set (Params.Planner_Parameters.Lower_Pos_Limit);
+         View.Upper_Pos_Limit_Input.Set (Params.Planner_Parameters.Upper_Pos_Limit);
+         View.Tangential_Velocity_Max_Input.Set (Params.Planner_Parameters.Tangential_Velocity_Max);
+         View.Acceleration_Max_Input.Set (Params.Planner_Parameters.Acceleration_Max);
+         View.Jerk_Max_Input.Set (Params.Planner_Parameters.Jerk_Max);
+         View.Snap_Max_Input.Set (Params.Planner_Parameters.Snap_Max);
+         View.Crackle_Max_Input.Set (Params.Planner_Parameters.Crackle_Max);
+         View.Axial_Velocity_Maxes_Input.Set (Params.Planner_Parameters.Axial_Velocity_Maxes);
+         View.Ignore_E_In_XYZE_Input.Set (Params.Planner_Parameters.Ignore_E_In_XYZE);
+         View.Shift_Blended_Corners_Input.Set (Params.Planner_Parameters.Shift_Blended_Corners);
+         View.Pressure_Advance_Time_Input.Set (Params.Planner_Parameters.Pressure_Advance_Time);
+         View.Chord_Error_Max_Input.Set (Params.Planner_Parameters.Chord_Error_Max);
+         View.Higher_Order_Scaler_Input.Set (Params.Planner_Parameters.Higher_Order_Scaler);
          View.Z_Steppers_Input.Set (Params.Z_Steppers);
          View.E_Steppers_Input.Set (Params.E_Steppers);
       end Read_Data;
@@ -745,16 +789,21 @@ package body GUI.Config_Editor is
             raise Constraint_Error with "Kinematics type must be selected.";
          end if;
 
-         Params.Lower_Pos_Limit                 := View.Lower_Pos_Limit_Input.Get;
-         Params.Upper_Pos_Limit                 := View.Upper_Pos_Limit_Input.Get;
-         Params.Max_Limits                      := View.Max_Limits_Input.Get;
-         Params.Max_Feedrate                    := View.Max_Feedrate_Input.Get;
-         Params.Max_Axial_Velocities            := View.Max_Axial_Velocities_Input.Get;
-         Params.Ignore_E_Feedrate_In_XYZE_Moves := View.Ignore_E_Feedrate_In_XYZE_Moves_Input.Get;
-         Params.Planning_Scaler                 := View.Planning_Scaler_Input.Get;
-         Params.Minimum_Cruise_Ratio            := View.Minimum_Cruise_Ratio_Input.Get;
-         Params.Z_Steppers                      := View.Z_Steppers_Input.Get;
-         Params.E_Steppers                      := View.E_Steppers_Input.Get;
+         Params.Planner_Parameters.Lower_Pos_Limit         := View.Lower_Pos_Limit_Input.Get;
+         Params.Planner_Parameters.Upper_Pos_Limit         := View.Upper_Pos_Limit_Input.Get;
+         Params.Planner_Parameters.Tangential_Velocity_Max := View.Tangential_Velocity_Max_Input.Get;
+         Params.Planner_Parameters.Acceleration_Max        := View.Acceleration_Max_Input.Get;
+         Params.Planner_Parameters.Jerk_Max                := View.Jerk_Max_Input.Get;
+         Params.Planner_Parameters.Snap_Max                := View.Snap_Max_Input.Get;
+         Params.Planner_Parameters.Crackle_Max             := View.Crackle_Max_Input.Get;
+         Params.Planner_Parameters.Axial_Velocity_Maxes    := View.Axial_Velocity_Maxes_Input.Get;
+         Params.Planner_Parameters.Ignore_E_In_XYZE        := View.Ignore_E_In_XYZE_Input.Get;
+         Params.Planner_Parameters.Shift_Blended_Corners   := View.Shift_Blended_Corners_Input.Get;
+         Params.Planner_Parameters.Pressure_Advance_Time   := View.Pressure_Advance_Time_Input.Get;
+         Params.Planner_Parameters.Chord_Error_Max         := View.Chord_Error_Max_Input.Get;
+         Params.Planner_Parameters.Higher_Order_Scaler     := View.Higher_Order_Scaler_Input.Get;
+         Params.Z_Steppers                                 := View.Z_Steppers_Input.Get;
+         Params.E_Steppers                                 := View.E_Steppers_Input.Get;
 
          My_Config.Config_File.Write (Params);
 
