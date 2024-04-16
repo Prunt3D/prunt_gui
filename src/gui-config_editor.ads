@@ -402,15 +402,17 @@ package GUI.Config_Editor is
 
          Kind_Table : Cards_Table_Type;
 
-         Double_Tap_Table           : aliased Gnoga.Gui.Element.Table.Table_Type;
-         Switch_Row                 : Parameter_Rows.Parameter_Row;
-         Switch_Input               : Basic_Inputs.Input_Switch_Name_Input.Discrete_Input;
-         First_Move_Distance_Row    : Parameter_Rows.Parameter_Row;
-         First_Move_Distance_Input  : Basic_Inputs.Length_Input;
-         Second_Move_Distance_Row   : Parameter_Rows.Parameter_Row;
-         Second_Move_Distance_Input : Basic_Inputs.Length_Input;
-         Switch_Position_Row        : Parameter_Rows.Parameter_Row;
-         Switch_Position_Input      : Basic_Inputs.Length_Input;
+         Double_Tap_Table             : aliased Gnoga.Gui.Element.Table.Table_Type;
+         Switch_Row                   : Parameter_Rows.Parameter_Row;
+         Switch_Input                 : Basic_Inputs.Input_Switch_Name_Input.Discrete_Input;
+         First_Move_Distance_Row      : Parameter_Rows.Parameter_Row;
+         First_Move_Distance_Input    : Basic_Inputs.Length_Input;
+         Back_Off_Move_Distance_Row   : Parameter_Rows.Parameter_Row;
+         Back_Off_Move_Distance_Input : Basic_Inputs.Length_Input;
+         Second_Move_Distance_Row     : Parameter_Rows.Parameter_Row;
+         Second_Move_Distance_Input   : Basic_Inputs.Length_Input;
+         Switch_Position_Row          : Parameter_Rows.Parameter_Row;
+         Switch_Position_Input        : Basic_Inputs.Length_Input;
 
          Set_To_Value_Table : aliased Gnoga.Gui.Element.Table.Table_Type;
          Value_Row          : Parameter_Rows.Parameter_Row;

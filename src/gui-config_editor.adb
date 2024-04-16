@@ -896,11 +896,20 @@ package body GUI.Config_Editor is
             Name        => "First Move Distance (mm):",
             Description =>
               "The minimum length of the first move, may be negative to home towards negative infinity. " &
-              "The axis will first move twice this far away from the homing direction iff the switch is hit. " &
-              "The axis will then move at least this far in total, " &
-              "and no further than this far after the switch is hit. " &
-              "The axis will then move twice this far away from the switch before the second move.",
+              "The axis will move at least this far in total during the first homing move, " &
+              "and no further than this far after the switch is hit.",
             Data        => View.First_Move_Distance_Input);
+
+         View.Back_Off_Move_Distance_Input.Create (Form => View);
+         View.Back_Off_Move_Distance_Row.Create
+           (Parent      => View.Double_Tap_Table,
+            Name        => "Back-Off Move Distance (mm):",
+            Description =>
+              "The distance to back off after the first move, after the second move, " &
+              "and before the first move iff the switch is hit before the first move." &
+              "If the move after the second move would place the axis outside of the work area then the axis will " &
+              "instead move to the closest face of the work area to the desired position.",
+            Data        => View.Back_Off_Move_Distance_Input);
 
          View.Second_Move_Distance_Input.Create (Form => View);
          View.Second_Move_Distance_Row.Create
@@ -951,6 +960,7 @@ package body GUI.Config_Editor is
                View.Kind_Table.Tabs.Select_Tab ("Double Tap");
                View.Switch_Input.Set (Params.Switch);
                View.First_Move_Distance_Input.Set (Params.First_Move_Distance);
+               View.Back_Off_Move_Distance_Input.Set (Params.Back_Off_Move_Distance);
                View.Second_Move_Distance_Input.Set (Params.Second_Move_Distance);
                View.Switch_Position_Input.Set (Params.Switch_Position);
             when Set_To_Value_Kind =>
@@ -966,6 +976,7 @@ package body GUI.Config_Editor is
             Params                      := (Kind => Double_Tap_Kind, others => <>);
             Params.Switch               := View.Switch_Input.Get;
             Params.First_Move_Distance  := View.First_Move_Distance_Input.Get;
+            Params.Back_Off_Move_Distance  := View.Back_Off_Move_Distance_Input.Get;
             Params.Second_Move_Distance := View.Second_Move_Distance_Input.Get;
             Params.Switch_Position      := View.Switch_Position_Input.Get;
          elsif View.Kind_Table.Cards.Current_Card = View.Set_To_Value_Table'Unrestricted_Access then
