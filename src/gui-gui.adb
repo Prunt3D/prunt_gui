@@ -25,6 +25,7 @@ with Gnoga.Gui.View.Card;
 with Gnoga.Gui.Base;
 with Gnoga.Server;
 with Ada.Directories;
+with Ada.Exceptions.Is_Null_Occurrence;
 
 package body GUI.GUI is
 
@@ -339,7 +340,23 @@ package body GUI.GUI is
 
       Main_Window.Buffer_Connection (False);
 
-      Connection.Hold;
+      select
+         Connection.Hold;
+      then abort
+         declare
+            Occurrence : Ada.Exceptions.Exception_Occurrence;
+         begin
+            Fatal_Exception_Occurrence_Holder.Get (Occurrence);
+            App.Fatal_Error_Div.Create
+              (App.Main_Window.all,
+               UXStrings.From_UTF_8 ("<h1>FATAL ERROR</h1><p>") &
+               To_HTML (UXStrings.From_UTF_8 (Ada.Exceptions.Exception_Information (Occurrence))) &
+               UXStrings.From_UTF_8 ("</p>"));
+            App.Fatal_Error_Div.Place_Inside_Top_Of (App.Main_Window.Document.Body_Element.all);
+            App.Main_Table.Hidden (True);
+         end;
+         Connection.Hold;
+      end select;
 
       Status_Updater_Task.Stop;
 
@@ -366,5 +383,27 @@ package body GUI.GUI is
       Gnoga.Application.Multi_Connect.On_Connect_Handler (Event => On_Connect'Unrestricted_Access, Path => "default");
       Gnoga.Application.Multi_Connect.Message_Loop;
    end Run;
+
+   protected body Fatal_Exception_Occurrence_Holder_Type is
+      procedure Set
+        (Cause      : Ada.Task_Termination.Cause_Of_Termination;
+         ID         : Ada.Task_Identification.Task_Id;
+         Occurrence : Ada.Exceptions.Exception_Occurrence)
+      is
+      begin
+         if Ada.Exceptions.Is_Null_Occurrence (Data) then
+            Ada.Exceptions.Save_Occurrence (Data, Occurrence);
+         end if;
+
+         --  Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (Occurrence));
+      end Set;
+
+      entry Get (Occurrence : out Ada.Exceptions.Exception_Occurrence)
+        when not Ada.Exceptions.Is_Null_Occurrence (Data)
+      is
+      begin
+         Ada.Exceptions.Save_Occurrence (Occurrence, Data);
+      end Get;
+   end Fatal_Exception_Occurrence_Holder_Type;
 
 end GUI.GUI;

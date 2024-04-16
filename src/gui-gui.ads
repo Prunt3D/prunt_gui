@@ -31,6 +31,9 @@ with Gnoga.Gui.View.Console;
 with Gnoga.Gui.Element.Table;
 with GUI.Cards_Table; use GUI.Cards_Table;
 with UXStrings;       use UXStrings;
+with Ada.Exceptions;
+with Ada.Task_Identification;
+with Ada.Task_Termination;
 
 generic
    with package My_Config is new Config.Config (<>);
@@ -41,6 +44,22 @@ generic
 package GUI.GUI is
 
    procedure Run;
+
+   protected type Fatal_Exception_Occurrence_Holder_Type is
+      procedure Set
+        (Cause      : Ada.Task_Termination.Cause_Of_Termination;
+         ID         : Ada.Task_Identification.Task_Id;
+         Occurrence : Ada.Exceptions.Exception_Occurrence);
+      entry Get (Occurrence : out Ada.Exceptions.Exception_Occurrence);
+   private
+      Data : aliased Ada.Exceptions.Exception_Occurrence;
+   end Fatal_Exception_Occurrence_Holder_Type;
+
+   Fatal_Exception_Occurrence_Holder : constant access Fatal_Exception_Occurrence_Holder_Type :=
+     new Fatal_Exception_Occurrence_Holder_Type;
+   --  The only reason that this is a type and an allocation is so that we can safely call 'Access on the procedure.
+   --  'Unrestricted_Access works if we replace this with just a plain protected object but that is a GNAT extension
+   --  and of course introduces the risk of dangling pointers.
 
 private
 
@@ -61,6 +80,8 @@ private
       Main_Window : aliased Gnoga.Gui.Window.Pointer_To_Window_Class;
 
       Loading_Div : aliased Gnoga.Gui.Element.Common.DIV_Type;
+
+      Fatal_Error_Div : aliased Gnoga.Gui.Element.Common.DIV_Type;
 
       Main_Table : aliased Cards_Table_Type;
 
