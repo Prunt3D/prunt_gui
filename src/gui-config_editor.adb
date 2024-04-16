@@ -679,6 +679,7 @@ package body GUI.Config_Editor is
               "allowing for different limits on different axes. " &
               "You do not need to take this value in to account when setting position limits or mm per step values. " &
               "Feedrates are limited based on the real positions, not the scaled positions." &
+              "Corner deviation is based on scaled positions." &
               "Acceleration and above are limited based on scaled values.",
             Data        => View.Higher_Order_Scaler_Input);
 
